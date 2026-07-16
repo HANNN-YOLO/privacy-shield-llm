@@ -15,15 +15,17 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 
 **July 13 – July 20, 2026**
 
-| Date          | Activity                | Commit                           |
-| ------------- | ----------------------- | -------------------------------- |
-| July 13, 2026 | Day 1 - Fundamental API | docs : add API Fundamental notes |
+| Date          | Activity                                                  | Commit                                                                 |
+| ------------- | --------------------------------------------------------- | ---------------------------------------------------------------------- |
+| July 13, 2026 | Day 1 - API Architecture Research & REST API Fundamentals | docs: add FastAPI architecture and REST API learning notes             |
+| June 14, 2026 | Day 2 - FastAPI Project Initialization                    | feat: initialize FastAPI project structure and development environment |
 
-<!-- | June 09, 2026 | Day 2 | SHA-256 Hashing                               |
+<!--
 | June 10, 2026 | Day 3 | Cryptography Library & ECDSA Key Generation   |
 | June 11, 2026 | Day 4 | Firmware Simulation                           |
 | June 12, 2026 | Day 5 | Digital Signature Generation                  |
-| June 13, 2026 | Day 6 | Signature Verification & Week 1 Documentation | -->
+| June 13, 2026 | Day 6 | Signature Verification & Week 1 Documentation |
+ -->
 
 ---
 
