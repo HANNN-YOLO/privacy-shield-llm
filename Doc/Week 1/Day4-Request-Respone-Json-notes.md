@@ -1,0 +1,1 @@
+So today I'm going to parse a JSON request and response. FastAPI uses a library called pydantic. Pydantic creates a connection between the client and the server. If the send setting is a string, the server must receive it as a string. Otherwise, an error message will be displayed because it must comply with the contract rules when coding.
