@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 
@@ -43,6 +43,11 @@ class ClinicalNote(BaseModel):
 
 @app.post("/redact")
 def redact(note: ClinicalNote):
+    if note.text.strip() == "":
+        raise HTTPException(
+            status_code=400,
+            detail="Clinical note cannot be empty."
+        )
     return {
         "received_text": note.text
     }

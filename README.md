@@ -18,12 +18,12 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 | Date          | Activity                                                  | Commit                                                                 |
 | ------------- | --------------------------------------------------------- | ---------------------------------------------------------------------- |
 | July 13, 2026 | Day 1 - API Architecture Research & REST API Fundamentals | docs: add FastAPI architecture and REST API learning notes             |
-| June 14, 2026 | Day 2 - FastAPI Project Initialization                    | feat: initialize FastAPI project structure and development environment |
-| June 15, 2026 | Day 3 - API Endpoint Development                          | feat: implement root and redact API endpoints                          |
-| June 11, 2026 | Day 4 - Request & Response Processing                     | feat: add JSON request parsing and response handling                   |
+| July 14, 2026 | Day 2 - FastAPI Project Initialization                    | feat: initialize FastAPI project structure and development environment |
+| July 15, 2026 | Day 3 - API Endpoint Development                          | feat: implement root and redact API endpoints                          |
+| July 16, 2026 | Day 4 - Request & Response Processing                     | feat: add JSON request parsing and response handling                   |
+| July 17, 2026 | Day 5 - API Validation & Error Handling                   | feat: implement request validation and error handling                  |
 
 <!--
-| June 12, 2026 | Day 5 | Digital Signature Generation                  |
 | June 13, 2026 | Day 6 | Signature Verification & Week 1 Documentation | -->
 
 ---
