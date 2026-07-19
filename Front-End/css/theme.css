@@ -1,0 +1,48 @@
+/* Dark Theme */
+body.dark {
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    --card-bg: #1e293b;
+    --border: #334155;
+    --text: #f8fafc;
+    --text-light: #94a3b8;
+    --glass: rgba(15, 23, 42, 0.8);
+    --glass-border: rgba(51, 65, 85, 0.5);
+
+    /* Text Colors Dark */
+    --text: #f8fafc;
+    --text-light: #94a3b8;
+
+    /* Buttons Dark */
+    --btn-secondary-bg: #334155;
+    
+    /* FIXING CLEAR BUTTON FOR DARK MODE */
+    --btn-clear-bg: rgba(239, 68, 68, 0.15); /* Merah gelap transparan elegan */
+    --btn-clear-text: #fca5a5;              /* Teks merah muda pastel terang */
+}
+
+body.dark textarea {
+    background: #0f172a;
+    color: #f8fafc;
+}
+
+body.dark .entity-list div {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+body.dark #upload-btn, 
+body.dark #copy-btn {
+    background: #334155;
+    color: #f8fafc;
+}
+
+body.dark #upload-btn:hover, 
+body.dark #copy-btn:hover {
+    background: #475569;
+}
+
+body.dark #theme-toggle {
+    background: #334155;
+    border-color: #475569;
+}

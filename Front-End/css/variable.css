@@ -1,0 +1,29 @@
+:root {
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+    --primary: #0284c7;       
+    --primary-hover: #0369a1;
+    --danger: #ef4444;
+
+    /* Backgrounds Light */
+    --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #f8fafc 100%);
+    --sidebar-bg: rgba(255, 255, 255, 0.75);
+    --card-bg: #ffffff;
+    --textarea-bg: #f8fafc;
+    --border: #e2e8f0;
+    --glass-border: rgba(255, 255, 255, 0.60);
+
+    /* Text Colors Light */
+    --text: #0f172a;
+    --text-light: #64748b;
+    --text-white: #ffffff;
+
+    /* Buttons Light */
+    --btn-secondary-bg: #f1f5f9;
+    --btn-clear-bg: #fef2f2;       /* Merah transparan lembut di tema terang */
+    --btn-clear-text: #ef4444;
+
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --transition: all 0.25s ease;
+    --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+}

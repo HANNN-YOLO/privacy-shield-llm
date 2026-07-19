@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+    <title>
+        Privacy Shield LLM
+    </title>
+
+    <!-- Google Font -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com">
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>
+                🛡 Privacy Shield
+            </h2>
+            <span>
+                LLM Security Platform
+            </span>
+        </div>
+        <nav>
+            <ul>
+                <li>
+                    🏠 Dashboard
+                </li>
+                <li>
+                    📝 Redaction
+                </li>
+                <li>
+                    📄 Logs
+                </li>
+                <li>
+                    📊 Statistics
+                </li>
+                <li>
+                    ⚙ Settings
+                </li>
+                <li>
+                    ℹ About
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ================================================= -->
+    <!-- MAIN -->
+    <!-- ================================================= -->
+    <main class="main-content">
+
+        <!-- ================================ -->
+        <!-- NAVBAR -->
+        <!-- ================================ -->
+        <header class="topbar">
+            <div>
+                <h1>
+                    Privacy Shield LLM
+                </h1>
+                <p>
+                    Automated PHI / PII Redaction Pipeline
+                </p>
+            </div>
+
+            <div class="topbar-right">
+                <div class="api-status" id="api-status">
+                    Check Status
+                </div>
+                <button id="theme-toggle">
+                    🌙
+                </button>
+            </div>
+        </header>
+
+        <!-- ================================ -->
+        <!-- DASHBOARD -->
+        <!-- ================================ -->
+
+        <section class="dashboard">
+            <div class="dashboard-card">
+                <h3>
+                    Words
+                </h3>
+                <p id="word-count">
+                    0
+                </p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>
+                    Characters
+                </h3>
+                <p id="character-count">
+                    0
+                </p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>
+                    Estimated PHI
+                </h3>
+                <p id="phi-count">
+                    0
+                </p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>
+                    Processing
+                </h3>
+                <p id="processing-time">
+                    --
+                </p>
+            </div>
+        </section>
+
+        <!-- ================================ -->
+        <!-- MAIN GRID -->
+        <!-- ================================ -->
+
+        <section class="workspace">
+            <!-- LEFT -->
+
+            <div class="left-panel">
+                <div class="glass-card">
+                    <div class="section-header">
+                        <h2>
+                            Clinical Note
+                        </h2>
+                    </div>
+
+                    <textarea
+                        id="clinical-note"
+                        placeholder="Paste your clinical note here...">
+                    </textarea>
+
+                    <div class="button-group">
+                        <button id="upload-btn">
+                            📂 Upload TXT
+                        </button>
+
+                        <button id="clear-btn">
+                            🗑 Clear
+                        </button>
+
+                        <button id="redact-btn">
+                            🚀 Redact
+                        </button>
+                    </div>
+
+                </div>
+                <div class="glass-card">
+                    <h2>
+                        Activity Log
+                    </h2>
+                    <div
+                        id="activity-log"
+                        class="activity-log">
+                        <p>
+                            ✔ Application Started
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="right-panel">
+                <div class="glass-card">
+                    <h2>
+                        Detected PHI
+                    </h2>
+                    
+                    <div class="entity-list">
+                        <div>
+                            👤 Name
+                        </div>
+
+                        <div>
+                            📧 Email
+                        </div>
+
+                        <div>
+                            📞 Phone
+                        </div>
+
+                        <div>
+                            🏥 Hospital
+                        </div>
+
+                        <div>
+                            📍 Address
+                        </div>
+
+                        <div>
+                            🗓 Date
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h2>
+                        Redacted Result
+                    </h2>
+
+                    <textarea
+                        id="redacted-result"
+                        readonly
+                        placeholder="The redacted text will appear here...">
+                    </textarea>
+
+                    <div class="button-group">
+                        <button id="copy-btn">
+                            📋 Copy
+                        </button>
+
+                        <button id="download-btn">
+                            💾 Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================================================= -->
+    <!-- LOADING -->
+    <!-- ================================================= -->
+
+    <div id="loading-overlay">
+        <div class="loader"></div>
+
+        <h3>
+            Processing Clinical Note...
+        </h3>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- TOAST -->
+    <!-- ================================================= -->
+
+    <div id="toast">
+        Connected Successfully
+    </div>
+
+    <!-- ================================================= -->
+    <!-- FILE -->
+    <!-- ================================================= -->
+
+    <input
+        type="file"
+        id="file-input"
+        accept=".txt"
+        hidden>
+
+    <!-- ================================================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ================================================= -->
+
+    <script src="js/utils.js"></script>
+    <script src="js/logger.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
