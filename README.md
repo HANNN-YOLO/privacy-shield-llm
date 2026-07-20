@@ -27,20 +27,22 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 
 ---
 
-<!-- ## 📅 Week 2 — CI/CD Automated Code Signing
+# 📅 Week 2 —
 
-**June 14 – June 19, 2026**
+**July 20 – July 27, 2026**
 
-| Date          | Day    | Topics                                         |
-| ------------- | ------ | ---------------------------------------------- |
-| June 14, 2026 | Day 8  | Git Workflow Fundamentals                      |
-| June 15, 2026 | Day 9  | GitHub Actions Fundamentals                    |
-| June 16, 2026 | Day 10 | Build GitHub Actions Workflow                  |
-| June 17, 2026 | Day 11 | GitHub Secrets Management                      |
-| June 18, 2026 | Day 12 | Python Workflow Integration                    |
-| June 19, 2026 | Day 13 | Docker-based OTA Server & Week 2 Documentation |
+| Date    | Activity                                   | Commit                                                    |
+| ------- | ------------------------------------------ | --------------------------------------------------------- |
+| July 20 | Day 8 - Fundamental Regex Pattern Research | docs: add regex learning examples and validation patterns |
 
---- -->
+<!--
+| June 15 | Day 9 - GitHub Actions              | docs: github actions notes                                    |
+| June 16 | Day 10 - Build GitHub Actions       | feat: add first github action                                 |
+| June 17 | Day 11 - GitHub Secrets             | feat: configure github secrets                                |
+| June 18 | Day 12 - GitHub Actions Integration | feat: automate firmware signing                               |
+| June 19 | Day 13 & 14 - Docker OTA Server     | test: validate automated signing and docummentation in week 2 | -->
+
+---
 
 <!-- ## 📅 Week 3 — OTA Client Development & Verification
 
