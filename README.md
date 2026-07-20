@@ -23,9 +23,7 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 | July 16, 2026  | Day 4 - Request & Response Processing                                                           | feat: add JSON request parsing and response handling                   |
 | July 17, 2026  | Day 5 - API Validation & Error Handling                                                         | feat: implement request validation and error handling                  |
 | Junly 18, 2026 | Day 6 - Building Front-End, Refactor Back-End, Connected Between Front-End & Back-End use CORS, | refactor: organize project into routes schemas and services            |
-
-<!--
-| June 13, 2026 | Day 6 | Signature Verification & Week 1 Documentation | -->
+| July 19, 2026  | Day 7 - API Testing & Documentation                                                             | test: verify API endpoints and update Swagger documentation            |
 
 ---
 
