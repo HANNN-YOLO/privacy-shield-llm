@@ -1,0 +1,5 @@
+Today, I will write code to detect phone numbers using regex.
+
+I am using the regex patterns `\b(?:\+62|62|0)` and `(?:[\s-]?\d){8,13}\b`. The concept involves using `\b` as a boundary to ensure the text match is treated as a complete unit (a whole word) rather than a partial match. Next, regarding `(?:\+62|62|0)`, the use of the `|` operator (meaning "or") allows the pattern to match `+62`, `62`, or `0`, thereby accommodating phone number formats from various regions.
+
+Then there is `(?:[\s-]?\d){8,13}`. The `(?: )` construct groups the pattern into a single unit without storing it as a capturing group. Inside, `[\s-]` selects one of the specified characters: `\s` for a space or `-` (hyphen), which may appear as a separator in certain phone number formats. This is followed by `?\d`, where `?` makes the preceding element optional and `\d` represents a digit (0–9). Finally, `{8,13}` is a quantifier specifying a repetition range of 8 to 13 times; thus, the pattern `(?:[\s-]?\d)` repeats 8 to 13 times to match the sequence of spaces/hyphens and digits.
