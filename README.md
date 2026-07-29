@@ -11,7 +11,7 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 
 ---
 
-## 📅 Week 1 —
+## 📅 Week 1 — Fast API Server
 
 **July 13 – July 20, 2026**
 
@@ -23,20 +23,20 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 | July 16, 2026  | Day 4 - Request & Response Processing                                                           | feat: add JSON request parsing and response handling                   |
 | July 17, 2026  | Day 5 - API Validation & Error Handling                                                         | feat: implement request validation and error handling                  |
 | Junly 18, 2026 | Day 6 - Building Front-End, Refactor Back-End, Connected Between Front-End & Back-End use CORS, | refactor: organize project into routes schemas and services            |
-| July 19, 2026  | Day 7 - API Testing & Documentation                                                             | test: verify API endpoints and update Swagger documentation            |
+| July 19, 2026  | Day 7 - API Testing & Documentation in Week 1                                                   | test: verify API endpoints and update Postman documentation            |
 
 ---
 
-# 📅 Week 2 —
+# 📅 Week 2 — Regex Detection
 
 **July 20 – July 27, 2026**
 
 | Date    | Activity                                   | Commit                                                    |
 | ------- | ------------------------------------------ | --------------------------------------------------------- |
 | July 20 | Day 8 - Fundamental Regex Pattern Research | docs: add regex learning examples and validation patterns |
+| July 21 | Day 9 - Email Detection Module             | feat: implement email detection using regex               |
 
 <!--
-| June 15 | Day 9 - GitHub Actions              | docs: github actions notes                                    |
 | June 16 | Day 10 - Build GitHub Actions       | feat: add first github action                                 |
 | June 17 | Day 11 - GitHub Secrets             | feat: configure github secrets                                |
 | June 18 | Day 12 - GitHub Actions Integration | feat: automate firmware signing                               |
