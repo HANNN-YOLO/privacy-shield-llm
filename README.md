@@ -38,6 +38,7 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 | July 22 | Day 10 - Phone Detection Module            | feat: implement phone number detection using regex        |
 | July 23 | Day 11 - Date Detection Module             | feat: implement date detection using regex                |
 | July 24 | Day 12 - Identity Detection Module         | feat: implement patient ID and SSN detection              |
+| July 25 | Day 13 - Regex Detection Pipeline          | feat: integrate regex detectors into detection pipeline   |
 
 <!--
 | June 19 | Day 13 & 14 - Docker OTA Server     | test: validate automated signing and docummentation in week 2 | -->
