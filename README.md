@@ -31,30 +31,32 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 
 **July 20 – July 27, 2026**
 
-| Date    | Activity                                   | Commit                                                                                         |
-| ------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| July 20 | Day 8 - Fundamental Regex Pattern Research | docs: add regex learning examples and validation patterns                                      |
-| July 21 | Day 9 - Email Detection Module             | feat: implement email detection using regex                                                    |
-| July 22 | Day 10 - Phone Detection Module            | feat: implement phone number detection using regex                                             |
-| July 23 | Day 11 - Date Detection Module             | feat: implement date detection using regex                                                     |
-| July 24 | Day 12 - Identity Detection Module         | feat: implement patient ID and SSN detection                                                   |
-| July 25 | Day 13 - Regex Detection Pipeline          | feat: integrate regex detectors into detection pipeline                                        |
-| June 19 | Day 14 - Regex Testing                     | test: validate regex detection pipeline with sample clinical notesand docummentation in week 2 |
+| Date    | Activity                                   | Commit                                                                                          |
+| ------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| July 20 | Day 8 - Fundamental Regex Pattern Research | docs: add regex learning examples and validation patterns                                       |
+| July 21 | Day 9 - Email Detection Module             | feat: implement email detection using regex                                                     |
+| July 22 | Day 10 - Phone Detection Module            | feat: implement phone number detection using regex                                              |
+| July 23 | Day 11 - Date Detection Module             | feat: implement date detection using regex                                                      |
+| July 24 | Day 12 - Identity Detection Module         | feat: implement patient ID and SSN detection                                                    |
+| July 25 | Day 13 - Regex Detection Pipeline          | feat: integrate regex detectors into detection pipeline                                         |
+| July 26 | Day 14 - Regex Testing                     | test: validate regex detection pipeline with sample clinical notes and docummentation in week 2 |
 
 ---
 
-<!-- ## 📅 Week 3 — OTA Client Development & Verification
+## 📅 Week 3 — NLP Detection
 
-**June 21 – June 26, 2026**
+**July 27 – Agustus 2, 2026**
 
-| Date          | Day    | Topics                                   |
-| ------------- | ------ | ---------------------------------------- |
-| June 21, 2026 | Day 15 | OTA Server Fundamentals                  |
-| June 22, 2026 | Day 16 | Create OTA Request Client                |
-| June 23, 2026 | Day 17 | Build Verification Logging               |
-| June 24, 2026 | Day 18 | Firmware Hash Verification               |
-| June 25, 2026 | Day 19 | Firmware Signature Verification          |
-| June 26, 2026 | Day 20 | Testing Scenarios & Week 3 Documentation |
+| Date    | Activity                    | Commit                                                    |
+| ------- | --------------------------- | --------------------------------------------------------- |
+| July 27 | Day 15 - NLP & NER Research | docs: add NLP and named entity recognition learning notes |
+
+<!--
+| June 22 | Day 16 | Create OTA Request Client                |
+| June 23 | Day 17 | Build Verification Logging               |
+| June 24 | Day 18 | Firmware Hash Verification               |
+| June 25 | Day 19 | Firmware Signature Verification          |
+| June 26 | Day 20 | Testing Scenarios & Week 3 Documentation | -->
 
 --- -->
 
