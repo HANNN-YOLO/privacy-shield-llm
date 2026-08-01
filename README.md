@@ -50,15 +50,15 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 | Date    | Activity                    | Commit                                                    |
 | ------- | --------------------------- | --------------------------------------------------------- |
 | July 27 | Day 15 - NLP & NER Research | docs: add NLP and named entity recognition learning notes |
+| July 28 | Day 16 - spaCy Integration  | feat: integrate spaCy named entity recognition            |
 
 <!--
-| June 22 | Day 16 | Create OTA Request Client                |
 | June 23 | Day 17 | Build Verification Logging               |
 | June 24 | Day 18 | Firmware Hash Verification               |
 | June 25 | Day 19 | Firmware Signature Verification          |
 | June 26 | Day 20 | Testing Scenarios & Week 3 Documentation | -->
 
---- -->
+---
 
 <!-- ## 📅 Week 4 — Secure OTA Hardening & Final Integration
 
