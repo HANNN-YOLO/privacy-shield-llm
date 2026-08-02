@@ -1,1 +1,4 @@
 __pycache__/
+
+# hide before production
+app/rules/*

@@ -12,7 +12,6 @@ def home():
     }
 
 @router.post("/redact", response_model=RedactResponse)
-
 def redact(request: RedactRequest):
     result = redact_text(request.text)
     return RedactResponse(

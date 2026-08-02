@@ -4,6 +4,7 @@ from app.services.detectors.nlp.presidio_detector import detect_pii
 from app.services.detectors.nlp.patient_detector import classify_patient
 from app.services.detectors.nlp.doctor_detector import classify_doctor
 from app.services.detectors.nlp.address_detector import detect_address
+from app.services.detectors.nlp.context_detector import detect_context
 
 router = APIRouter()
 
@@ -27,6 +28,11 @@ def presidio_test(request: RedactRequest):
         results
     )
 
+    context = detect_context(
+        request.text,
+        results
+    )
+
     response = []
 
     for result in results:
@@ -42,5 +48,6 @@ def presidio_test(request: RedactRequest):
         "entities": response,
         "patient" : patient,
         "doctor" : doctor,
-        "address": address
+        "address": address,
+        "context": context
     }

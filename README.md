@@ -47,13 +47,14 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 
 **July 27 – Agustus 2, 2026**
 
-| Date    | Activity                                | Commit                                                    |
-| ------- | --------------------------------------- | --------------------------------------------------------- |
-| July 27 | Day 15 - NLP & NER Research             | docs: add NLP and named entity recognition learning notes |
-| July 28 | Day 16 - spaCy Integration              | feat: integrate spaCy named entity recognition            |
-| July 29 | Day 17 - Microsoft Presidio Integration | feat: integrate Microsoft Presidio analyzer engine        |
-| July 30 | Day 18 - Person Entity Detection        | feat: implement patient and doctor name detection         |
-| July 31 | Day 20 - Address Entity Detection       | feat: implement address and location entity detection     |
+| Date       | Activity                                | Commit                                                        |
+| ---------- | --------------------------------------- | ------------------------------------------------------------- |
+| July 27    | Day 15 - NLP & NER Research             | docs: add NLP and named entity recognition learning notes     |
+| July 28    | Day 16 - spaCy Integration              | feat: integrate spaCy named entity recognition                |
+| July 29    | Day 17 - Microsoft Presidio Integration | feat: integrate Microsoft Presidio analyzer engine            |
+| July 30    | Day 18 - Person Entity Detection        | feat: implement patient and doctor name detection             |
+| July 31    | Day 19 - Address Entity Detection       | feat: implement address and location entity detection         |
+| Agustus 01 | Day 20 - Context-Aware Detection        | feat: improve contextual entity recognition for medical terms |
 
 <!--
 | June 26 | Day 20 | Testing Scenarios & Week 3 Documentation | -->

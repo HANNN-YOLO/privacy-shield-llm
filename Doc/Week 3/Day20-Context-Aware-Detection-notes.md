@@ -1,0 +1,3 @@
+Today, I am writing code for context detection using Presidio.
+
+I am implementing this context detection because disease names need to be ignored—given that information regarding diseases does not constitute sensitive personal data. I have devised detection rules to disregard specific disease-related terms, such as "disease," "syndrome," "disorder," "infection," "cancer," "diabetes," "hypertension," "Parkinson's," and "Alzheimer's." If any of these terms are encountered, the system will skip them (excluding them from both entity transformation and analysis). You can view evidence of this implementation in the images for Week 3, specifically in the file named "context Detection.png".
