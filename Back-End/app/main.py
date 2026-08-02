@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.redact import router as redact_router
+from app.routes.presidio import router as presidio_router
 
 app = FastAPI(
     title="Privacy Shield LLM API",
@@ -33,6 +34,7 @@ app.add_middleware(
 # Router
 # ==========================================
 app.include_router(redact_router)
+app.include_router(presidio_router)
 
 
 # ==========================================

@@ -3,8 +3,8 @@ from app.providers.spacy_provider import get_nlp
 ENTITY_MAPPING = {
     "PERSON": "[PERSON]",
     "ORG": "[ORG]",
-    "GPE": "[ADDRESS]",
-    "LOC": "[ADDRESS]",
+    "GPE": "[GPE]",
+    "LOC": "[LOC]",
     "DATE": "[DATE]"
 }
 
