@@ -9,4 +9,16 @@ def detect_pii(text: str):
         language="en"
     )
 
+    entities = []
+
+    for result in results:
+
+        entities.append({
+            "entity": result.entity_type,
+            "text": text[result.start:result.end],
+            "start": result.start,
+            "end": result.end,
+            "score": result.score
+        })
+
     return results

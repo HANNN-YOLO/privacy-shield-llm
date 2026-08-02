@@ -3,6 +3,7 @@ from app.schemas.request import RedactRequest
 from app.services.detectors.nlp.presidio_detector import detect_pii
 from app.services.detectors.nlp.patient_detector import classify_patient
 from app.services.detectors.nlp.doctor_detector import classify_doctor
+from app.services.detectors.nlp.address_detector import detect_address
 
 router = APIRouter()
 
@@ -21,6 +22,11 @@ def presidio_test(request: RedactRequest):
         results
     )
 
+    address = detect_address(
+        request.text,
+        results
+    )
+
     response = []
 
     for result in results:
@@ -35,5 +41,6 @@ def presidio_test(request: RedactRequest):
         "success": True,
         "entities": response,
         "patient" : patient,
-        "doctor" : doctor
+        "doctor" : doctor,
+        "address": address
     }

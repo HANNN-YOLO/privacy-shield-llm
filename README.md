@@ -52,7 +52,8 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 | July 27 | Day 15 - NLP & NER Research             | docs: add NLP and named entity recognition learning notes |
 | July 28 | Day 16 - spaCy Integration              | feat: integrate spaCy named entity recognition            |
 | July 29 | Day 17 - Microsoft Presidio Integration | feat: integrate Microsoft Presidio analyzer engine        |
-| Jult 30 | Day 18 - Person Entity Detection        | feat: implement patient and doctor name detection         |
+| July 30 | Day 18 - Person Entity Detection        | feat: implement patient and doctor name detection         |
+| July 31 | Day 20 - Address Entity Detection       | feat: implement address and location entity detection     |
 
 <!--
 | June 26 | Day 20 | Testing Scenarios & Week 3 Documentation | -->
