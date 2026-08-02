@@ -17,5 +17,8 @@ Phone : 08123456789
 
 Office : +628123456789
 
-Text
+Text for spaCy
 Patient John Doe visited Jakarta General Hospital on 12 July 2026 for a routine health check-up. His home address is Jl. Sudirman No. 25, Jakarta, Indonesia. His Patient ID is PAT123456 and his Medical Record Number is MRN998877. For further information, please contact him at 08123456789 or +628123456789. You can also send an email to john.doe@gmail.com or admin@jakartageneralhospital.org. The next appointment has been scheduled for 15 August 2026. Dr. Michael Brown from Jakarta General Hospital will examine the patient during the next visit.
+
+Text for detect Patient or Doctor
+Patient John Doe is seeing Doctor Reyhan Rafaidhil
