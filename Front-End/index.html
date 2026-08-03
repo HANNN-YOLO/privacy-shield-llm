@@ -175,14 +175,23 @@
                 </div>
                 <div class="glass-card">
                     <h2>
-                        Activity Log
+                        Redacted Result
                     </h2>
-                    <div
-                        id="activity-log"
-                        class="activity-log">
-                        <p>
-                            ✔ Application Started
-                        </p>
+
+                    <textarea
+                        id="redacted-result"
+                        readonly
+                        placeholder="The redacted text will appear here...">
+                    </textarea>
+
+                    <div class="button-group">
+                        <button id="copy-btn">
+                            📋 Copy
+                        </button>
+
+                        <button id="download-btn">
+                            💾 Download
+                        </button>
                     </div>
                 </div>
             </div>
@@ -223,23 +232,14 @@
 
                 <div class="glass-card">
                     <h2>
-                        Redacted Result
+                        Activity Log
                     </h2>
-
-                    <textarea
-                        id="redacted-result"
-                        readonly
-                        placeholder="The redacted text will appear here...">
-                    </textarea>
-
-                    <div class="button-group">
-                        <button id="copy-btn">
-                            📋 Copy
-                        </button>
-
-                        <button id="download-btn">
-                            💾 Download
-                        </button>
+                    <div
+                        id="activity-log"
+                        class="activity-log">
+                        <p>
+                            ✔ Application Started
+                        </p>
                     </div>
                 </div>
             </div>

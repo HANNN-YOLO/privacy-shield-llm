@@ -69,15 +69,14 @@ def detect_context(
         # ===========================
 
         if any(keyword in context for keyword in DOCTOR_KEYWORDS):
-            context_entities.append({
-                "entity": "DOCTOR",
-                "text": text[
-                    entity.start:entity.end
-                ],
-                "start": entity.start,
-                "end": entity.end,
-                "score": entity.score
-            })
+            context_entities.append(
+                RecognizerResult(
+                    entity_type="DOCTOR",
+                    start=entity.start,
+                    end=entity.end,
+                    score=entity.score
+                )
+            )
             continue
 
         # ===========================
@@ -85,14 +84,13 @@ def detect_context(
         # ===========================
 
         if any(keyword in context for keyword in PATIENT_KEYWORDS):
-            context_entities.append({
-                "entity": "PATIENT",
-                "text": text[
-                    entity.start:entity.end
-                ],
-                "start": entity.start,
-                "end": entity.end,
-                "score": entity.score
-            })
+            context_entities.append(
+                RecognizerResult(
+                    entity_type="PATIENT",
+                    start=entity.start,
+                    end=entity.end,
+                    score=entity.score
+                )
+            )
             continue
     return context_entities

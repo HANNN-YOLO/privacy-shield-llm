@@ -4,7 +4,9 @@ DOCTOR_KEYWORDS = [
     "dr.",
     "dr ",
     "doctor ",
-    "Doctor "
+    "Doctor ",
+    "physician",
+    "consultant"
 ]
 
 def classify_doctor(text: str, entities: list[RecognizerResult]):
@@ -15,11 +17,12 @@ def classify_doctor(text: str, entities: list[RecognizerResult]):
         before = text[max(0, entity.start - 30):entity.start].lower()
 
         if any(keyword in before for keyword in DOCTOR_KEYWORDS):
-            results.append({
-                "entity": "DOCTOR",
-                "text": text[entity.start:entity.end],
-                "start": entity.start,
-                "end": entity.end,
-                "score": entity.score
-            })
+            results.append(
+                RecognizerResult(
+                    entity_type="DOCTOR",
+                    start=entity.start,
+                    end=entity.end,
+                    score=entity.score
+                )
+            )
     return results

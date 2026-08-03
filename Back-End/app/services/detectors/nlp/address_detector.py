@@ -15,7 +15,6 @@ ADDRESS_KEYWORDS = [
         "kelurahan",
         "kecamatan",
         "kota", 
-        "city",
         "province"
 ]
 
@@ -44,13 +43,12 @@ def detect_address(
 
         # Cek apakah ada keyword alamat
         if any(keyword in context for keyword in ADDRESS_KEYWORDS):
-            addresses.append({
-                "entity": "ADDRESS",
-                "text": text[
-                    entity.start:entity.end
-                ],
-                "start": entity.start,
-                "end": entity.end,
-                "score": entity.score
-            })
+            addresses.append(
+                RecognizerResult(
+                    entity_type="ADDRESS",
+                    start=entity.start,
+                    end=entity.end,
+                    score=entity.score
+                )
+            )
     return addresses

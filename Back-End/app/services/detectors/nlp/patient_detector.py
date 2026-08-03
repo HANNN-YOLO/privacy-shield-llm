@@ -8,11 +8,12 @@ def classify_patient(text: str, entities: list[RecognizerResult]):
             continue
         before = text[max(0, entity.start - 30):entity.start].lower()
         if "patient" in before:
-            results.append({
-                "entity": "PATIENT",
-                "text": text[entity.start:entity.end],
-                "start": entity.start,
-                "end": entity.end,
-                "score": entity.score
-            })
+            results.append(
+                RecognizerResult(
+                    entity_type="PATIENT",
+                    start=entity.start,
+                    end=entity.end,
+                    score=entity.score
+                )
+            )
     return results
