@@ -59,13 +59,15 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 
 ---
 
-<!-- ## 📅 Week 4 — Secure OTA Hardening & Final Integration
+## 📅 Week 4 — Secure OTA Hardening & Final Integration
 
-**June 28 – July 04, 2026**
+**Agustus 03 – Agustus 09, 2026**
 
-| Date          | Day    | Topics                                    |
-| ------------- | ------ | ----------------------------------------- |
-| June 28, 2026 | Day 22 | Semantic Versioning                       |
+| Date       | Activity                         | Commit                                                         |
+| ---------- | -------------------------------- | -------------------------------------------------------------- |
+| Agustus 03 | Day 22 - Pseudonymization Engine | feat: implement pseudonymization engine for sensitive entities |
+
+<!--
 | June 29, 2026 | Day 23 | Firmware Versioning                       |
 | June 30, 2026 | Day 24 | Anti-Rollback Research                    |
 | July 01, 2026 | Day 25 | Rollback Protection                       |

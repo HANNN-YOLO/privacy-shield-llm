@@ -1,0 +1,13 @@
+Today, I will generate dummy data and learn about pseudonymization, token mapping, and dictionaries.
+
+Data pseudonymization is a privacy measure used specifically for reporting, analysis, LLM applications, and other data needs to protect data from its original form. Fundamentally, pseudonymization is a data protection technique—a process that allows data to be linked back to the original individual using secure additional information. For instance, what is the difference between pseudonymization and anonymization? Anonymization protects data permanently, making it impossible to revert to its original form. In contrast, pseudonymization offers temporary data protection; why? Because the data is used for purposes such as reporting or analysis. Therefore, if required for specific activities, the protected data can be restored to its original state. Common pseudonymization techniques include scrambling, encryption (using key pairs that require additional information), masking, tokenization (token mapping), and data blurring.
+
+Token mapping is a tokenization technique derived from the concept of pseudonymization; for example, tokenization replaces sensitive data with a token that can be mapped back to the original data.
+
+A dictionary is a key-value store featuring associative mapping; it contains unique keys that represent specific values. There is a common search operation where the system searches only for the key due to its uniqueness—why search only for the key? Because if the key is found, the value is automatically found as well. There are also update operations, where the value is updated based on its unique key, and delete operations, which remove the key and its associated value from the dictionary.
+
+So, I am currently writing the code for `pseudonymizer.py` and `token_generator.py`, and placing both files within the following folder structure: _Back-end_ > _app_ > _services_ > _pseudonymization_. So, I wrote the code for `pseudonymizer.py`, which calls a function from `token_generator.py`. If the pseudonymization process detects a new entity, the system assigns a label such as `PERSON_001`; if another new person appears, `token_generator.py` continues the numbering to `PERSON_002`. Additionally, `pseudonymizer.py` stores key-value pairs for this mapping—for example, mapping `PATIENT_001` to "John Smith," or:
+{
+"John Smith" : "PERSON_001"
+}
+Please note that this code is still in the testing phase and has not yet been integrated into the final pipeline; you can view the test results in the images section (Week 4 folder) under the filenames `test_token.png` and `test_pseudonymizer.py`.
