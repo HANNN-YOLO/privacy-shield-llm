@@ -3,7 +3,15 @@ import re
 EMAIL_PATTERN = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
 
 def detect_email(text: str):
-    return re.findall(EMAIL_PATTERN, text)
+    entities = []
+    for match in re.finditer(EMAIL_PATTERN, text):
+        entities.append({
+            "start": match.start(),
+            "end": match.end(),
+            "text": match.group(),
+            "entity_type": "EMAIL"
+        })
+    return entities
 
 
 def redact_email(text: str):

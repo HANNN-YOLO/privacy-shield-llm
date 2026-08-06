@@ -6,7 +6,16 @@ PHONE_PATTERN = (
 )
 
 def detect_phone(text: str):
-    return re.findall(PHONE_PATTERN, text)
+    entities = []
+    for match in re.finditer(PHONE_PATTERN, text):
+        entities.append({
+            "start": match.start(),
+            "end": match.end(),
+            "text": match.group(),
+            "entity_type": "PHONE"
+        })
+
+    return entities
 
 def redact_phone(text: str):
     return re.sub(PHONE_PATTERN, "[PHONE]", text)

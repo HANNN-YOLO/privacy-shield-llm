@@ -17,17 +17,23 @@ ID_PATTERNS = [
     r"\bINS[- ]?\d{3,10}\b",
 
     # Generic ID
-    r"\bID[- ]?\d{3,10}\b",
+    r"\bID[- ]?\d{3,10}\b"
 
     # Numeric Identifier
-    r"\b\d{8,16}\b"
+    # r"\b\d{8,16}\b"
 ]
 
 def detect_id(text: str):
-    detected = []
+    entities = []
     for pattern in ID_PATTERNS:
-        detected.extend(re.findall(pattern, text))
-    return detected
+        for match in re.finditer(pattern, text):
+            entities.append({
+                "start": match.start(),
+                "end": match.end(),
+                "text": match.group(),
+                "entity_type": "ID"
+            })
+    return entities
 
 def redact_id(text: str):
     for pattern in ID_PATTERNS:

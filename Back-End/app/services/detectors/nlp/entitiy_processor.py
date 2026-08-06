@@ -19,6 +19,13 @@ def process_entities(
         )
     )
 
+    for r in custom_entities:
+        print("=" * 80)
+        print("PATIENT OUTPUT")
+        print(repr(text[r.start:r.end]))
+        print(r.start, r.end)
+        print("=" * 80)
+
     custom_entities.extend(
         classify_doctor(
             text,
@@ -32,6 +39,18 @@ def process_entities(
             analyzer_results
         )
     )
+    print("=" * 80)
+    print("BEFORE ADDRESS DETECTOR")
+
+    for e in analyzer_results:
+        print(
+            e.entity_type,
+            repr(text[e.start:e.end]),
+            e.start,
+            e.end
+        )
+
+    print("=" * 80)
 
     custom_entities.extend(
         detect_context(

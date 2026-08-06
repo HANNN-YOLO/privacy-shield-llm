@@ -1,63 +1,120 @@
 from presidio_analyzer import RecognizerResult
 
-PRIORITY = {
-    "PATIENT": 100,
-    "DOCTOR": 100,
-    "ADDRESS": 100,
-
-    "PERSON": 50,
-    "LOCATION": 50,
-    "GPE": 50,
-
-    "EMAIL_ADDRESS": 80,
-    "PHONE_NUMBER": 80,
-    "DATE_TIME": 80,
-    "URL": 80
+CUSTOM = {
+    "PATIENT",
+    "DOCTOR",
+    "ADDRESS"
 }
+
+REGEX = {
+    "EMAIL",
+    "PHONE",
+    "DATE",
+    "ID"
+}
+
+def source_priority(entity_type: str):
+
+    if entity_type in CUSTOM:
+        return 3
+
+    if entity_type in REGEX:
+        return 2
+
+    return 1
 
 
 def resolve_entities(
     entities: list[RecognizerResult]
-) -> list[RecognizerResult]:
+):
+
+    entities = sorted(
+        entities,
+        key=lambda e: (
+            e.start,
+            e.end
+        )
+    )
 
     resolved = []
 
-    # urutkan berdasarkan posisi
-    entities = sorted(
-        entities,
-        key=lambda x: (x.start, x.end)
-    )
-
     for entity in entities:
-        duplicated = False
+
+        replaced = False
+
         for i, existing in enumerate(resolved):
-            same_span = (
+
+            overlap = (
+                entity.start < existing.end
+                and
+                entity.end > existing.start
+            )
+
+            if not overlap:
+                continue
+
+            current_source = source_priority(
+                entity.entity_type
+            )
+
+            existing_source = source_priority(
+                existing.entity_type
+            )
+
+            # =====================================
+            # CASE 1
+            # Span sama
+            # =====================================
+
+            if (
                 entity.start == existing.start
                 and
                 entity.end == existing.end
-            )
+            ):
 
-            if not same_span:
-                continue
+                if current_source > existing_source:
 
-            duplicated = True
+                    resolved[i] = entity
 
-            current_priority = PRIORITY.get(
-                entity.entity_type,
-                0
-            )
+                elif current_source == existing_source:
 
-            existing_priority = PRIORITY.get(
-                existing.entity_type,
-                0
-            )
+                    # entity terakhir menang
+                    resolved[i] = entity
 
-            if current_priority > existing_priority:
+                replaced = True
+                break
+
+            # =====================================
+            # CASE 2
+            # Span berbeda
+            # =====================================
+
+            if current_source > existing_source:
+
                 resolved[i] = entity
 
+            elif current_source == existing_source:
+
+                current_len = (
+                    entity.end - entity.start
+                )
+
+                existing_len = (
+                    existing.end - existing.start
+                )
+
+                if current_len > existing_len:
+
+                    resolved[i] = entity
+
+            replaced = True
             break
 
-        if not duplicated:
+        if not replaced:
+
             resolved.append(entity)
 
-    return resolved
+    return sorted(
+        resolved,
+        key=lambda e: e.start
+    )

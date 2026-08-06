@@ -1,4 +1,5 @@
 from presidio_analyzer import RecognizerResult
+from app.utils.text import clean_entity
 
 PATIENT_KEYWORDS = [
     "patient",
@@ -30,23 +31,18 @@ MEDICAL_TERMS = [
 ]
 
 
-# ===========================
-# Context Detector
-# ===========================
-
 def detect_context(
     text: str,
     results: list[RecognizerResult]
 ):
 
     context_entities = []
+
     for entity in results:
 
-        # Day 6 hanya fokus PERSON
         if entity.entity_type != "PERSON":
             continue
 
-        # Ambil context sekitar entity
         before = text[
             max(0, entity.start - 40):entity.start
         ].lower()
@@ -57,26 +53,32 @@ def detect_context(
 
         context = before + " " + after
 
-        # ===========================
-        # Ignore Medical Term
-        # ===========================
-
+        # Ignore medical terms
         if any(term in context for term in MEDICAL_TERMS):
             continue
+
+        # Bersihkan entity sekali saja
+        value, start, end = clean_entity(
+            text,
+            entity.start,
+            entity.end
+        )
 
         # ===========================
         # Doctor
         # ===========================
 
         if any(keyword in context for keyword in DOCTOR_KEYWORDS):
+
             context_entities.append(
                 RecognizerResult(
                     entity_type="DOCTOR",
-                    start=entity.start,
-                    end=entity.end,
+                    start=start,
+                    end=end,
                     score=entity.score
                 )
             )
+
             continue
 
         # ===========================
@@ -84,13 +86,16 @@ def detect_context(
         # ===========================
 
         if any(keyword in context for keyword in PATIENT_KEYWORDS):
+
             context_entities.append(
                 RecognizerResult(
                     entity_type="PATIENT",
-                    start=entity.start,
-                    end=entity.end,
+                    start=start,
+                    end=end,
                     score=entity.score
                 )
             )
+
             continue
+
     return context_entities

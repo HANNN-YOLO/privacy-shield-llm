@@ -1,4 +1,5 @@
 from presidio_analyzer import RecognizerResult
+from app.utils.text import clean_entity
 
 DOCTOR_KEYWORDS = [
     "dr.",
@@ -16,13 +17,22 @@ def classify_doctor(text: str, entities: list[RecognizerResult]):
             continue
         before = text[max(0, entity.start - 30):entity.start].lower()
 
-        if any(keyword in before for keyword in DOCTOR_KEYWORDS):
-            results.append(
-                RecognizerResult(
-                    entity_type="DOCTOR",
-                    start=entity.start,
-                    end=entity.end,
-                    score=entity.score
-                )
+        if not any(keyword in before for keyword in DOCTOR_KEYWORDS):
+                continue
+        
+                
+        value, start, end = clean_entity(
+        text,
+        entity.start,
+        entity.end
+        )
+
+        results.append(
+            RecognizerResult(
+                entity_type="DOCTOR",
+                start=start,
+                end=end,
+                score=entity.score
             )
+        )
     return results

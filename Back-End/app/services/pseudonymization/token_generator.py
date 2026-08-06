@@ -1,5 +1,15 @@
 class TokenGenerator:
     def __init__(self):
+        self.reset()
+
+    def generate(self, entity_type: str) -> str:
+        entity_type = entity_type.upper()
+        if entity_type not in self.counters:
+            self.counters[entity_type] = 0
+        self.counters[entity_type] += 1
+        return f"{entity_type}_{self.counters[entity_type]:03d}"
+
+    def reset(self):
         self.counters = {
             "PATIENT": 0,
             "DOCTOR": 0,
@@ -12,27 +22,11 @@ class TokenGenerator:
             "ORG": 0
         }
 
-    def generate(self, entity_type: str) -> str:
-
-        entity_type = entity_type.upper()
-
-        # Tambahkan counter jika entity baru
-        if entity_type not in self.counters:
-            self.counters[entity_type] = 0
-
-        # Naikkan counter
-        self.counters[entity_type] += 1
-
-        token = f"{entity_type}_{self.counters[entity_type]:03d}"
-
-        return token
-
-    def get_counter(self, entity_type: str) -> int:
-        return self.counters.get(entity_type.upper(), 0)
-
-    def reset(self):
-        for key in self.counters:
-            self.counters[key] = 0
+    def get_counter(self, entity_type: str):
+        return self.counters.get(
+            entity_type.upper(),
+            0
+        )
 
     def show_counters(self):
         return self.counters.copy()

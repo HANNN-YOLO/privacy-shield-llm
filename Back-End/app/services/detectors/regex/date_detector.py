@@ -13,7 +13,15 @@ DATE_PATTERN = (
 )
 
 def detect_date(text: str):
-    return re.findall(DATE_PATTERN, text)
+    entities = []
+    for match in re.finditer(DATE_PATTERN, text):
+        entities.append({
+            "start": match.start(),
+            "end": match.end(),
+            "text": match.group(),
+            "entity_type": "DATE"
+        })
+    return entities
 
 def redact_date(text: str):
     return re.sub(DATE_PATTERN, "[DATE]", text)
