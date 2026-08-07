@@ -20,6 +20,7 @@ REGISTER ALL EVENT
 ====================================================== */
 function registerEvents() {
     const redactButton = document.getElementById("redact-btn");
+    const restoreButton = document.getElementById("restore-btn");
     const clearButton = document.getElementById("clear-btn");
     const uploadButton =document.getElementById("upload-btn");
     const copyButton = document.getElementById("copy-btn");
@@ -44,6 +45,14 @@ function registerEvents() {
     redactButton.addEventListener(
         "click",
         handleRedaction
+    );
+
+    /* ==========================
+    Restore
+    ========================== */
+    restoreButton.addEventListener(
+        "click",
+        handleRestore
     );
 
 
@@ -131,44 +140,69 @@ async function handleRedaction(){
         const response = await redactText(text);
         console.log(response);
 
-
-        /*
-        ui.js
-        */
-
-        // displayRedactedText(
-        //     // response.redacted_text
-        //     displayRedactedText(response),
-        // );
         displayRedactedText(response),
 
-        // updateEntities(
-        //     response.entities
-        // );
-
-
-        /*
-        dashboard.js
-        */
-
         updateDashboard();
-
-
-        /*
-        logger.js
-        */
 
         addLog(
             "Redaction Success"
         );
 
-
-        /*
-        ui.js
-        */
-
         showToast(
             "Redaction Completed",
+            "success"
+        );
+
+    }
+
+    catch(error){
+        console.error(error);
+        addLog(
+            "Connection Failed"
+        );
+
+        showToast(
+            "FastAPI Connection Failed",
+            "error"
+        );
+    }
+    finally{
+        hideLoading();
+    }
+}
+
+/* ======================================================
+HANDLE RESTORE
+====================================================== */
+async function handleRestore(){
+    const text = getClinicalText();
+    if(text.trim()===""){
+        showToast(
+            "Clinical Note cannot be empty",
+            "error"
+        );
+        addLog("Empty Input");
+        return;
+    }
+
+    showLoading();
+
+    addLog("Sending Request to FastAPI");
+
+    try{
+        const response = await restoreText(text);
+        console.log(response);
+
+        displayRedactedText(response),
+
+        updateDashboard();
+
+        addLog(
+            "Restore Success"
+        );
+
+        showToast(
+            "Restore Completed",
             "success"
         );
 

@@ -64,3 +64,24 @@ class MappingService:
         for key in self.redis.scan_iter(match=pattern):
 
             self.redis.delete(key)
+
+    # =====================================
+    # Restore Multiple Tokens
+    # =====================================
+
+    def restore_tokens(
+        self,
+        tokens: list[str]
+    ):
+
+        restored = {}
+
+        for token in tokens:
+
+            original = self.get_original(token)
+
+            if original is not None:
+
+                restored[token] = original
+
+        return restored

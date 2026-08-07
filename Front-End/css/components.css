@@ -33,20 +33,26 @@ COMPONENTS.CSS
 }
 
 .dashboard-card p {
-    font-size: 36px; /* Lebih pop-out angka dashboardnya */
+    font-size: 36px;
     margin-top: 8px;
     color: var(--text);
     font-weight: 700;
 }
 
-/* Workspace Layout */
+/* ==========================================
+WORKSPACE
+========================================== */
+
 .workspace {
     display: grid;
     grid-template-columns: 6.5fr 3.5fr;
     gap: 25px;
 }
 
-/* Glass Card */
+/* ==========================================
+GLASS CARD
+========================================== */
+
 .glass-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -57,13 +63,16 @@ COMPONENTS.CSS
 }
 
 .glass-card h2 {
-    font-size: 20px; /* Lebih jelas terbaca */
+    font-size: 20px;
     font-weight: 600;
     margin-bottom: 20px;
     color: var(--text);
 }
 
-/* Textarea styling */
+/* ==========================================
+TEXTAREA
+========================================== */
+
 textarea {
     width: 100%;
     min-height: 240px;
@@ -73,7 +82,7 @@ textarea {
     padding: 18px;
     border-radius: var(--radius-md);
     background: var(--textarea-bg);
-    font-size: 16px; /* Ukuran input ketikan diperbesar */
+    font-size: 16px;
     color: var(--text);
     line-height: 1.6;
     transition: var(--transition);
@@ -82,62 +91,135 @@ textarea {
 textarea:focus {
     border-color: var(--primary);
     background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+    box-shadow: 0 0 0 4px rgba(2,132,199,.10);
 }
 
-/* Button Group - FIXING CONTRAST */
-.button-group {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    margin-top: 20px;
+/* ==========================================
+BUTTON GROUP
+========================================== */
+
+.button-group{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:20px;
+    flex-wrap:wrap;
 }
 
-.button-group button {
-    flex: 1;
-    padding: 14px 22px; /* Lebih tebal dan kokoh */
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-size: 15px; /* Naik dari 14px */
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: var(--transition);
+.button-group button{
+    flex:1;
+    min-width:140px;
+    height:48px;
+
+    border:none;
+    border-radius:12px;
+
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    font-size:15px;
+    font-weight:600;
+
+    transition:.25s ease;
 }
 
-/* Specific Button Colors */
-#upload-btn, #copy-btn {
-    background: var(--btn-secondary-bg);
-    color: var(--text);
+/* Hover Animation */
+
+.button-group button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(0,0,0,.15);
 }
 
-#upload-btn:hover, #copy-btn:hover {
-    filter: brightness(0.95);
+.button-group button:active{
+    transform:scale(.97);
 }
 
-/* FIXED CLEAN THEME FOR CLEAR BUTTON */
-#clear-btn {
-    background: var(--btn-clear-bg);
-    color: var(--btn-clear-text);
+/* ==========================================
+UPLOAD
+========================================== */
+
+#upload-btn{
+    background:#475569;
+    color:#fff;
 }
 
-#clear-btn:hover {
-    filter: brightness(0.9);
+#upload-btn:hover{
+    background:#334155;
 }
 
-#redact-btn, #download-btn {
-    background: var(--primary);
-    color: var(--text-white);
+/* ==========================================
+CLEAR
+========================================== */
+
+#clear-btn{
+    background:#7f1d1d;
+    color:#fff;
 }
 
-#redact-btn:hover, #download-btn:hover {
-    background: var(--primary-hover);
+#clear-btn:hover{
+    background:#991b1b;
 }
 
-/* Entity List */
+/* ==========================================
+REDACT
+========================================== */
+
+#redact-btn{
+    background:#0284c7;
+    color:white;
+}
+
+#redact-btn:hover{
+    background:#0369a1;
+}
+
+/* ==========================================
+RESTORE
+========================================== */
+
+#restore-btn{
+    background:#16a34a;
+    color:white;
+}
+
+#restore-btn:hover{
+    background:#15803d;
+}
+
+/* ==========================================
+COPY
+========================================== */
+
+#copy-btn{
+    background:#475569;
+    color:white;
+}
+
+#copy-btn:hover{
+    background:#334155;
+}
+
+/* ==========================================
+DOWNLOAD
+========================================== */
+
+#download-btn{
+    background:#2563eb;
+    color:white;
+}
+
+#download-btn:hover{
+    background:#1d4ed8;
+}
+
+/* ==========================================
+ENTITY LIST
+========================================== */
+
 .entity-list {
     display: flex;
     flex-direction: column;
@@ -153,7 +235,10 @@ textarea:focus {
     color: var(--text);
 }
 
-/* Activity Log */
+/* ==========================================
+ACTIVITY LOG
+========================================== */
+
 .activity-log {
     height: 180px;
     overflow-y: auto;
@@ -168,7 +253,10 @@ textarea:focus {
     border-radius: var(--radius-md);
 }
 
-/* Overlay & Toast Typo Fixes */
+/* ==========================================
+LOADING
+========================================== */
+
 #loading-overlay {
     position: fixed;
     inset: 0;
@@ -176,11 +264,15 @@ textarea:focus {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(15,23,42,.6);
     backdrop-filter: blur(8px);
     z-index: 999;
     color: white;
 }
+
+/* ==========================================
+TOAST
+========================================== */
 
 #toast {
     position: fixed;
@@ -191,7 +283,7 @@ textarea:focus {
     background: var(--success);
     color: white;
     display: none;
-    box-shadow: var(--shadow-lg); /* Fixed 'vr' typo */
+    box-shadow: var(--shadow-lg);
     z-index: 1000;
     font-weight: 600;
 }

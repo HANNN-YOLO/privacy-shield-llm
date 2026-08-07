@@ -31,7 +31,6 @@ async function checkAPIHealth() {
 /* ======================================================
 REDACT TEXT
 ====================================================== */
-
 async function redactText(text) {
     try {
         const response = await fetch(
@@ -65,22 +64,43 @@ async function redactText(text) {
 }
 
 /* ======================================================
+RESTORE TEXT
+====================================================== */
+async function restoreText(text) {
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/restore`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    text: text
+                })
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                `HTTP Error : ${response.status}`
+            );
+        }
+        const json = await response.json();
+        return json;
+    }
+    catch (error) {
+        console.error(
+            "API Error",
+            error
+        );
+        throw error;
+    }
+}
+
+/* ======================================================
 TEST CONNECTION
 ====================================================== */
-// async function testConnection() {
-//     const online = await checkAPIHealth();
-//     if (updateAPIStatus(online)) {
-//         console.log(
-//             "FastAPI Connected"
-//         );
-//     }
-//     else {api-status
-//         console.log(
-//             "FastAPI Offline"
-//         );
-//     }
-// }
-
 async function testConnection() {
     const online =
         await checkAPIHealth();

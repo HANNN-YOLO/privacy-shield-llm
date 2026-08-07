@@ -67,9 +67,9 @@ An automated HealthTech security pipeline that detects and redacts Protected Hea
 | ---------- | ------------------------------------ | -------------------------------------------------------------- |
 | Agustus 03 | Day 22 - Pseudonymization Engine     | feat: implement pseudonymization engine for sensitive entities |
 | Agustus 04 | Day 23 - Redis Token Mapping Service | feat: implement Redis-based token mapping service              |
+| Agustus 05 | Day 24 - Reverse Mapping Integration | feat: integrate reverse mapping into LLM response pipeline     |
 
 <!--
-| June 30, 2026 | Day 24 | Anti-Rollback Research                    |
 | July 01, 2026 | Day 25 | Rollback Protection                       |
 | July 02, 2026 | Day 26 | Threat Modeling                           |
 | July 03, 2026 | Day 27 | Security Architecture Diagram             |
