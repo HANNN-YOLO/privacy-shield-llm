@@ -1,0 +1,70 @@
+Functional Test - Clinical Note Normal [case 1]
+Patient John visited the hospital on 12/07/2026.
+Please contact john@gmail.com or 08123456789.
+
+Functional Test — Mixed Entity [case 2]
+Patient John Anderson was admitted to Jakarta General Hospital and was examined by Dr. Sarah Williams on 12/07/2026. The patient lives at Jl. Sudirman No. 25, RT 03/RW 05, Jakarta. For further information, contact john.anderson@gmail.com or 081234567890. Patient ID: PAT-12345 and Medical Record Number: MRN-987654.
+
+Functional Test — Duplicate Entity [case 3]
+Patient John visited the hospital.
+John was treated by Dr. Sarah.
+John returned for another examination.
+
+Validation Test - Normal Text [case 4]
+The patient is resting comfortably today.
+
+Validation Test - Uknown Text [case 5]
+Patient [PATIENT_999] visited the hospital.
+
+Validation Test - Empty Redis [case 6]
+[PATIENT_001] [EMAIL_001] [PHONE_001]
+
+Performance Testing - Small Clinical Note [case 8]
+Patient John Anderson visited the hospital on 12/07/2026. He was examined by Dr. Sarah Williams. His email is john.anderson@gmail.com and his phone number is 081234567890. He lives at Jl. Sudirman No. 25, Jakarta.
+
+
+Performance Testing - Medium Clinical Note [case 7]
+Patient Information
+
+Patient Budi Santoso, a 45-year-old male, visited the outpatient department on 01/08/2026. His patient ID is PAT-20260801 and his medical record number is MRN-456782.
+
+The patient lives at Jl. Perintis Kemerdekaan No. 25, Kecamatan Tamalanrea, Makassar. His phone number is 081234567890 and his email address is budi.santoso@gmail.com.
+
+Medical History
+
+The patient reported experiencing chest discomfort for approximately three days. He previously received treatment at the hospital on 15/07/2026. His previous medical record indicated a history of hypertension.
+
+Physician Assessment
+
+Dr. Andi Wijaya examined the patient and reviewed his medical history. The physician recommended additional laboratory tests and an ECG examination.
+
+Follow-up
+
+Patient Budi Santoso was instructed to return to the hospital on 08/08/2026. Dr. Andi Wijaya will review the laboratory results during the next appointment.
+
+Additional Patient
+
+Patient Siti Rahma was also registered at the hospital on 02/08/2026. Her patient ID is PAT-20260802 and her medical record number is MRN-782341. She lives at Jl. Ahmad Yani No. 17, Bandung. Her contact information is siti.rahma@gmail.com and 082112345678.
+
+Dr. Rina Pratiwi reviewed the patient's condition and documented the examination results.
+
+International Patient
+
+Patient Michael Brown was admitted to the hospital on 03/08/2026. His patient ID is PAT-20260803. He lives at 25 Main Street, New York. His email address is michael.brown@gmail.com and his phone number is +1 212-555-0198.
+
+Dr. James Wilson examined Michael Brown and recommended a follow-up examination on 10/08/2026.
+
+Performance Testing - Large Clinical Note [case 8]
+Patient Clinical Records
+
+Patient John Anderson was admitted to the hospital on 15/07/2026 for a routine medical examination. He was examined by Dr. Michael Johnson, who reviewed his medical history and previous laboratory results. The patient's medical record number is MRN-20260715, his patient ID is PAT-20260715, and his insurance ID is INS-783421. He can be contacted at john.anderson@gmail.com or +1 212-555-0187.
+
+Patient Sarah Williams visited the hospital on 18/07/2026 because of persistent abdominal pain. Dr. Emily Carter performed the examination and recommended additional laboratory tests. The patient currently lives at 25 Main Street, Boston, and her email address is sarah.williams@gmail.com. Her phone number is +1 617-555-0142.
+
+Patient Robert Miller returned for a follow-up examination on 21/07/2026. Dr. David Wilson reviewed his previous diagnosis and updated his medical record. His patient ID is PAT-20260721 and his medical record number is MRN-20260721. His current address is Jl. Diponegoro No. 12, and the patient's residential information also contains RT 03/RW 05. He can be contacted at robert.miller@gmail.com.
+
+Patient James Taylor was referred to Dr. Robert Smith for further evaluation on 25/07/2026. The physician reviewed the patient's medical history and prescribed additional laboratory tests. His employee ID is EMP-458921 and his insurance ID is INS-921734. The patient lives at 15 Oak Street, New York, and can be reached at +1 212-555-0198.
+
+Patient Emily Brown was admitted again on 28/07/2026 after reporting recurring symptoms. Dr. Sarah Thompson examined the patient and documented the latest clinical findings. Her patient ID is PAT-20260728, her medical record number is MRN-20260728, and her address is Jl. Ahmad Yani No. 45, with RT 02/RW 08. Her email is emily.brown@gmail.com and her phone number is +1 617-555-0166.
+
+During the final follow-up, Patient John Anderson returned on 01/08/2026 and was examined by Dr. Michael Johnson. Patient Sarah Williams returned on 02/08/2026 and was examined by Dr. Emily Carter. Patient Robert Miller returned on 03/08/2026 and was examined by Dr. David Wilson. Patient James Taylor returned on 04/08/2026 and was examined by Dr. Robert Smith. Patient Emily Brown returned on 05/08/2026 and was examined by Dr. Sarah Thompson. Each patient was scheduled for another medical examination after the physicians reviewed their previous records.

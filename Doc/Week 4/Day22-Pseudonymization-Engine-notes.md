@@ -10,4 +10,4 @@ So, I am currently writing the code for `pseudonymizer.py` and `token_generator.
 {
 "John Smith" : "PERSON_001"
 }
-Please note that this code is still in the testing phase and has not yet been integrated into the final pipeline; you can view the test results in the images section (Week 4 folder) under the filenames `test_token.png` and `test_pseudonymizer.py`.
+Please note that this code is still in the testing phase and has not yet been integrated into the final pipeline; you can view the test results in the images section (Week 4 folder) to (before final testing) under the filenames `test_token.png` and `test_pseudonymizer.py`.

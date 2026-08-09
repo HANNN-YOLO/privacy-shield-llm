@@ -1,69 +1,132 @@
-# versi lama
-from presidio_analyzer import RecognizerResult
+# # versi lama
+# from presidio_analyzer import RecognizerResult
 
+# from app.utils.text import clean_entity
+
+# ADDRESS_KEYWORDS = [
+#     "street ",
+#     "road",
+#     "avenue",
+#     "district",
+#     "city",
+#     "jalan",
+#     "jl ",
+#     "jl .",
+#     "jl.",
+#     "no",
+#     "rt",
+#     "rw",
+#     "kelurahan",
+#     "kecamatan",
+#     "kota",
+#     "province",
+# ]
+
+
+# def detect_address(
+#     text: str,
+#     results: list[RecognizerResult],
+# ) -> list[RecognizerResult]:
+#     addresses = []
+
+#     for entity in results:
+#         # Hanya proses LOCATION
+#         if entity.entity_type != "LOCATION":
+#             continue
+
+#         # Ambil konteks sebelum entity
+#         before = text[max(0, entity.start - 40):entity.start].lower()
+
+#         # Ambil konteks sesudah entity
+#         after = text[entity.end:min(len(text), entity.end + 40)].lower()
+
+        
+#         value, start, end = clean_entity(
+#             text,
+#             entity.start,
+#             entity.end,
+#         )
+
+#         # context = before + " " + after
+#         context = before + " " + value.lower() + " " + after
+
+#         # Cek apakah ada keyword alamat
+#         if not any(keyword in context for keyword in ADDRESS_KEYWORDS):
+#             continue
+
+
+#         addresses.append(
+#             RecognizerResult(
+#                 entity_type="ADDRESS",
+#                 start=start,
+#                 end=end,
+#                 score=entity.score,
+#             )
+#         )
+
+#     return addresses
+
+# versi upgrade dari nlp + regex
+import re
+from presidio_analyzer import RecognizerResult
 from app.utils.text import clean_entity
 
+# Kata kunci untuk mengecek konteks alamat (internasional & Indonesia)
 ADDRESS_KEYWORDS = [
-    "street ",
-    "road",
-    "avenue",
-    "district",
-    "city",
-    "jalan",
-    "jl ",
-    "jl .",
-    "no",
-    "rt",
-    "rw",
-    "kelurahan",
-    "kecamatan",
-    "kota",
-    "province",
+    "street", "road", "avenue", "district", "city",  # kata kunci Inggris
+    "jalan", "jl", "kelurahan", "kecamatan", "kota", # kata kunci Indonesia
+    "rt", "rw", "no"  # RT/RW dan No.
 ]
 
-
-def detect_address(
-    text: str,
-    results: list[RecognizerResult],
-) -> list[RecognizerResult]:
+def detect_address(text: str, results: list[RecognizerResult]) -> list[RecognizerResult]:
     addresses = []
+    detected_spans = []  # daftar rentang yang sudah ditambahkan
 
+    # 1. Deteksi menggunakan NLP (Presidio) berdasarkan konteks
     for entity in results:
-        # Hanya proses LOCATION
         if entity.entity_type != "LOCATION":
             continue
 
-        # Ambil konteks sebelum entity
+        # Ambil teks sekitar (40 karakter) untuk konteks sebelum dan sesudah
         before = text[max(0, entity.start - 40):entity.start].lower()
+        after = text[entity.end:entity.end + 40].lower()
 
-        # Ambil konteks sesudah entity
-        after = text[entity.end:min(len(text), entity.end + 40)].lower()
+        # Hapus whitespace ekstra dan tanda baca di akhir (clean_entity)
+        value, start, end = clean_entity(text, entity.start, entity.end)
 
-        
-        value, start, end = clean_entity(
-            text,
-            entity.start,
-            entity.end,
-        )
-
-        # context = before + " " + after
         context = before + " " + value.lower() + " " + after
-
-        # Cek apakah ada keyword alamat
-        if not any(keyword in context for keyword in ADDRESS_KEYWORDS):
-            continue
-
-
-        addresses.append(
-            RecognizerResult(
-                entity_type="ADDRESS",
-                start=start,
-                end=end,
-                score=entity.score,
+        # Jika konteks mengandung salah satu kata kunci alamat, terima sebagai alamat
+        if any(keyword in context for keyword in ADDRESS_KEYWORDS):
+            addresses.append(
+                RecognizerResult(entity_type="ADDRESS", start=start, end=end, score=entity.score)
             )
-        )
+            detected_spans.append((start, end))
+
+    # 2. Deteksi tambahan dengan regex untuk pola 'Jl.' (nama jalan)
+    pattern_jalan = re.compile(r"\b(?:Jalan|Jl\.?|Jln)\s+[A-Z][\w\s]*?(?:\s+No\.?\s*\d+)?\b", re.IGNORECASE)
+    for match in pattern_jalan.finditer(text):
+        span = (match.start(), match.end())
+        # Cek apakah span ini sudah tercakup
+        if not any(span[0] >= s and span[1] <= e for s, e in detected_spans):
+            _, start, end = clean_entity(text, span[0], span[1])
+            addresses.append(
+                RecognizerResult(entity_type="ADDRESS", start=start, end=end, score=0.85)
+            )
+            detected_spans.append((start, end))
+
+    # 3. Deteksi tambahan dengan regex untuk pola RT/RW
+    pattern_rt_rw = re.compile(r"\bRT\.?\s*\d{1,3}\s*/\s*RW\.?\s*\d{1,3}\b", re.IGNORECASE)
+    for match in pattern_rt_rw.finditer(text):
+        span = (match.start(), match.end())
+        if not any(span[0] >= s and span[1] <= e for s, e in detected_spans):
+            _, start, end = clean_entity(text, span[0], span[1])
+            addresses.append(
+                RecognizerResult(entity_type="ADDRESS", start=start, end=end, score=0.85)
+            )
+            detected_spans.append((start, end))
 
     return addresses
+
 
 # # version expand charakter
 # from presidio_analyzer import RecognizerResult

@@ -1,0 +1,42 @@
+Entities
+Patient Name : John Doe
+
+Patient ID : PAT123456
+
+MRN : MRN998877
+
+Admission : 20/07/2026
+
+Discharge : 2026-07-25
+
+Email : john@gmail.com
+
+Emergency : admin@yahoo.com
+
+Phone : 08123456789
+
+Office : +628123456789
+
+Text for spaCy
+Patient John Doe visited Jakarta General Hospital on 12 July 2026 for a routine health check-up. His home address is Jl. Sudirman No. 25, Jakarta, Indonesia. His Patient ID is PAT123456 and his Medical Record Number is MRN998877. For further information, please contact him at 08123456789 or +628123456789. You can also send an email to john.doe@gmail.com or admin@jakartageneralhospital.org. The next appointment has been scheduled for 15 August 2026. Dr. Michael Brown from Jakarta General Hospital will examine the patient during the next visit.
+
+Text for Patient or Doctor for Detection
+Patient John Doe is seeing Doctor Reyhan Rafaidhil
+
+Text for Address Detection
+Patient John Doe lives at Jl. Sudirman No.25 Jakarta Indonesia
+
+Text for context detection
+Patient John Smith visited Dr. Parkinson at City General Hospital in New York on [DATE_TIME_001]. The patient has been diagnosed with Parkinson's disease and mild Alzheimer's disease. He also has hypertension and type 2 diabetes. These medical conditions were confirmed after laboratory examinations. Dr. Parkinson recommended that John Smith continue taking medication for Parkinson's disease and schedule another consultation [DATE_TIME_002]. The patient currently lives at 1455 Madison Avenue, New York, NY [DATE_TIME_003]. For any questions, please contact City General Hospital or email john.smith@gmail.com. You may also call [PHONE_NUMBER_001].
+
+Text for pipeline final
+Medical Record
+
+Patient Name: John Doe
+Patient ID: PAT123456
+Medical Record Number: MRN998877
+
+Admission Date: 20/07/2026
+Discharge Date: 2026-07-25
+
+Patient John Doe was admitted to Jakarta General Hospital on 20 July 2026 after complaining of tremors, muscle stiffness, and balance problems. The attending physician was Dr. Michael Brown, assisted by Doctor Reyhan Rafaidhil from the Neurology Department. During the consultation, Dr. Parkinson reviewed the patient's neurological condition. After a complete examination, the medical team confirmed that the patient has Parkinson's disease. They also noted a previous history of Alzheimer's disease, hypertension, and type 2 diabetes mellitus. These medical conditions should remain unchanged during the redaction process because they represent diseases rather than personal identities. The patient currently lives at Jl. Sudirman No. 25, Jakarta, Indonesia. His secondary residence is located at 1455 Madison Avenue, New York, NY [DATE_TIME_003]. The patient was advised to return for another neurological examination on 15 August 2026. For emergency communication, please contact the patient using 08123456789 or +628123456789. Hospital staff may also reach him via john.doe@gmail.com. Administrative inquiries should be sent to admin@jakartageneralhospital.org. The patient confirmed that Dr. Parkinson will continue supervising his treatment for Parkinson's disease. In this sentence, "Dr. Parkinson" must be recognized as a doctor and therefore anonymized, while "Parkinson's disease" must remain visible because it refers to a medical diagnosis rather than a person's name. The final discharge summary was prepared on 2026-07-25 and electronically signed by Doctor Reyhan Rafaidhil before being archived in Jakarta General Hospital.

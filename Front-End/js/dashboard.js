@@ -89,3 +89,23 @@ function resetDashboard() {
     document.getElementById("phi-count").innerHTML = 0;
     document.getElementById("processing-time").innerHTML = "0 ms";
 }
+
+function updateEntityMetrics(response) {
+    const counts = response.entity_counts || {};
+    document.getElementById("person-count").textContent =
+        counts.person || 0;
+    document.getElementById("email-count").textContent =
+        counts.email || 0;
+    document.getElementById("phone-count").textContent =
+        counts.phone || 0;
+    document.getElementById("id-count").textContent =
+        counts.id || 0;
+    document.getElementById("address-count").textContent =
+        counts.address || 0;
+    document.getElementById("date-count").textContent =
+        counts.date || 0;
+    document.getElementById("phi-count").textContent =
+        response.total_entities || 0;
+    document.getElementById("processing-time").textContent =
+        `${response.processing_time_ms} ms`;
+}

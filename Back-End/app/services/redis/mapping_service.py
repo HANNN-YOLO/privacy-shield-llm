@@ -61,7 +61,9 @@ class MappingService:
 
         pattern = RedisKeys.mapping("*")
 
-        for key in self.redis.scan_iter(match=pattern):
+        for key in self.redis.scan_iter(
+            match=pattern
+        ):
 
             self.redis.delete(key)
 
@@ -78,7 +80,9 @@ class MappingService:
 
         for token in tokens:
 
-            original = self.get_original(token)
+            original = self.get_original(
+                token
+            )
 
             if original is not None:
 

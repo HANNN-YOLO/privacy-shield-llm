@@ -1,0 +1,42 @@
+Entities
+Patient Name : [PATIENT_001]
+
+Patient ID : [ID_001]
+
+MRN : [ID_002]
+
+Admission : [DATE_001]
+
+Discharge : [DATE_002]
+
+Email : [EMAIL_001]
+
+Emergency : [EMAIL_002]
+
+Phone : [PHONE_001]
+
+Office : +[PHONE_002]
+
+Text for spaCy
+Patient [PATIENT_001] visited Jakarta General Hospital on [DATE_003] for a routine health check-up. His home address is Jl. Sudirman No. 25, [ADDRESS_001], [ADDRESS_002]. His Patient ID is [ID_001] and his Medical Record Number is [ID_002]. For further information, please contact him at [PHONE_001] or +[PHONE_002]. You can also send an email to [EMAIL_003] or [EMAIL_004]. The next appointment has been scheduled for [DATE_004]. Dr. [DOCTOR_001] from Jakarta General Hospital will examine the patient during the next visit.
+
+Text for Patient or Doctor for Detection
+Patient [DOCTOR_002] is seeing Doctor [DOCTOR_003]
+
+Text for Address Detection
+Patient [PATIENT_001] lives at [ADDRESS_003]. [PATIENT_002] [ADDRESS_001] [ADDRESS_002]
+
+Text for context detection
+Patient [PATIENT_003] visited Dr. [DOCTOR_004] at City General Hospital in [ADDRESS_004] on [DATE_TIME_001]. The patient has been diagnosed with Parkinson's disease and mild Alzheimer's disease. He also has hypertension and type 2 diabetes. These medical conditions were confirmed after laboratory examinations. Dr. [DOCTOR_004] recommended that [PERSON_001] continue taking medication for Parkinson's disease and schedule another consultation [DATE_TIME_002]. The patient currently lives at 1455 [ADDRESS_005], [ADDRESS_004], NY [DATE_TIME_003]. For any questions, please contact City General Hospital or email [EMAIL_005]. You may also call [PHONE_NUMBER_001].
+
+Text for pipeline final
+Medical Record
+
+Patient Name: [PATIENT_001]
+Patient ID: [ID_001]
+Medical Record Number: [ID_002]
+
+Admission Date: [DATE_001]
+Discharge Date: [DATE_002]
+
+Patient [PATIENT_001] was admitted to Jakarta General Hospital on [DATE_005] after complaining of tremors, muscle stiffness, and balance problems. The attending physician was Dr. [DOCTOR_001], assisted by Doctor [DOCTOR_003] from the Neurology Department. During the consultation, Dr. [DOCTOR_004] reviewed the patient's neurological condition. After a complete examination, the medical team confirmed that the patient has Parkinson's disease. They also noted a previous history of Alzheimer's disease, hypertension, and type 2 diabetes mellitus. These medical conditions should remain unchanged during the redaction process because they represent diseases rather than personal identities. The patient currently lives at [ADDRESS_003]. Sudirman No. 25, [ADDRESS_001], [ADDRESS_002]. His secondary residence is located at [ADDRESS_006], [ADDRESS_004], NY [DATE_TIME_003]. The patient was advised to return for another neurological examination on [DATE_004]. For emergency communication, please contact the patient using [PHONE_001] or +[PHONE_002]. Hospital staff may also reach him via [EMAIL_003]. Administrative inquiries should be sent to [EMAIL_004]. The patient confirmed that Dr. [DOCTOR_004] will continue supervising his treatment for Parkinson's disease. In this sentence, "Dr. Parkinson" must be recognized as a doctor and therefore anonymized, while "Parkinson's disease" must remain visible because it refers to a medical diagnosis rather than a person's name. The final discharge summary was prepared on [DATE_002] and electronically signed by Doctor [DOCTOR_003] before being archived in Jakarta General Hospital.

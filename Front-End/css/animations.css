@@ -1,32 +1,158 @@
-/* Spinner */
-.loader{
-    width:70px;
-    height:70px;
-    border:8px solid #ddd;
-    border-top:8px solid var(--primary);
-    border-radius:50%;
-    animation:spin .8s linear infinite;
+/* ======================================================
+LOADING SPINNER
+====================================================== */
+
+.loader {
+
+    width: 64px;
+    height: 64px;
+
+    border: 7px solid rgba(255,255,255,.15);
+
+    border-top:
+        7px solid var(--primary);
+
+    border-radius: 50%;
+
+    animation:
+        spin .8s linear infinite;
+
+    margin-bottom: 20px;
+
 }
 
-@keyframes spin{
-    to{
-        transform:rotate(360deg);
+
+/* ======================================================
+SPINNER ANIMATION
+====================================================== */
+
+@keyframes spin {
+
+    from {
+
+        transform:
+            rotate(0deg);
+
     }
+
+    to {
+
+        transform:
+            rotate(360deg);
+
+    }
+
 }
 
-@keyframes fadeIn{
-    from{
-        opacity:0;
-        transform:translateY(20px);
+
+/* ======================================================
+FADE IN
+====================================================== */
+
+@keyframes fadeIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(20px);
+
     }
-    to{
-        opacity:1;
-        transform:translateY(0);
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
     }
+
 }
 
-.glass-card{
-    display:flex;
-    flex-direction:column;
-    gap:20px;
+
+/* ======================================================
+FADE OUT
+====================================================== */
+
+@keyframes fadeOut {
+
+    from {
+
+        opacity: 1;
+
+    }
+
+    to {
+
+        opacity: 0;
+
+    }
+
+}
+
+
+/* ======================================================
+GLASS CARD
+====================================================== */
+
+.glass-card {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        20px;
+
+}
+
+
+/* ======================================================
+LOADING TEXT
+====================================================== */
+
+#loading-overlay h3 {
+
+    margin:
+        0;
+
+    font-size:
+        20px;
+
+    font-weight:
+        600;
+
+    color:
+        #ffffff;
+
+}
+
+
+#loading-overlay p {
+
+    margin:
+        5px 0 0;
+
+    font-size:
+        14px;
+
+    color:
+        rgba(255,255,255,.75);
+
+}
+
+
+/* ======================================================
+LOADING ANIMATION
+====================================================== */
+
+#loading-overlay {
+
+    animation:
+        fadeIn .2s ease;
+
 }
