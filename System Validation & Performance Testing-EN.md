@@ -231,15 +231,15 @@ To determine the system's capability when the amount of text and number of entit
 
 ### Redaction Evidence
 
-![Medium clinical document performance result](images/Week%204/Performance%20Testing/case%202%20-%20medium%20clinical/redacted%20text.png)
+![Medium clinical document performance result](images/Week%204/Performance%20Testing/case%202-%20medium%20clinical/redacted%20text.png)
 
 ### Redis Evidence
 
-![Medium clinical document Redis evidence](images/Week%204/Performance%20Testing/case%202%20-%20medium%20clinical/redis%20server.png)
+![Medium clinical document Redis evidence](images/Week%204/Performance%20Testing/case%202-%20medium%20clinical/redis%20server.png)
 
 ### Restoration Evidence
 
-![Medium clinical document restoration result](images/Week%204/Performance%20Testing/case%202%20-%20medium%20clinical/restored%20text.png)
+![Medium clinical document restoration result](images/Week%204/Performance%20Testing/case%202-%20medium%20clinical/restored%20text.png)
 
 ### Conclusion
 

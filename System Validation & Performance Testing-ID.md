@@ -231,15 +231,15 @@ Mengetahui kemampuan sistem ketika jumlah teks dan entitas meningkat dibandingka
 
 ### Bukti Hasil Penyamaran
 
-![Hasil performa dokumen sedang](images/Week%204/Performance%20Testing/case%202%20-%20medium%20clinical/redacted%20text.png)
+![Hasil performa dokumen sedang](images/Week%204/Performance%20Testing/case%202-%20medium%20clinical/redacted%20text.png)
 
 ### Bukti Redis
 
-![Redis dokumen sedang](images/Week%204/Performance%20Testing/case%202%20-%20medium%20clinical/redis%20server.png)
+![Redis dokumen sedang](images/Week%204/Performance%20Testing/case%202-%20medium%20clinical/redis%20server.png)
 
 ### Bukti Pemulihan
 
-![Pemulihan dokumen sedang](images/Week%204/Performance%20Testing/case%202%20-%20medium%20clinical/restored%20text.png)
+![Pemulihan dokumen sedang](images/Week%204/Performance%20Testing/case%202-%20medium%20clinical/restored%20text.png)
 
 ### Kesimpulan
 
