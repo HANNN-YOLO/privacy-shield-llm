@@ -1,11 +1,3 @@
-# hide because need in week 1 for day 7
-# images/*
+__pycache__/
 
-# hide because need in week 2 for day 7
-# images/Week 2/*
-
-# hide because need in week 3 for day 7
-# images/Week 3/*
-
-# hide for now
-test_upload.txt
+.env

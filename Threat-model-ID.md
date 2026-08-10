@@ -5,7 +5,7 @@
 **Cakupan:** Redaksi, pseudonimisasi, pemetaan token Redis, pemulihan,
 API, masukan file, logging, dan batas integrasi LLM.
 
-------------------------------------------------------------------------
+---
 
 ## 1. Tujuan
 
@@ -21,7 +21,7 @@ Tujuan keamanan utama:
 
 Analisis berdasarkan arsitektur yang telah diterapkan:
 
-``` text
+```text
 Front-End
     |
     v
@@ -69,7 +69,7 @@ Response
 
 Alur pemulihan:
 
-``` text
+```text
 Front-End
     |
     v
@@ -100,37 +100,39 @@ Metrics Service
 Response
 ```
 
-------------------------------------------------------------------------
+---
 
 ## 2. Aset yang Harus Dilindungi
 
-  ID     Aset                   Contoh                             Sensitivitas
-  ------ ---------------------- ---------------------------------- --------------
-  A-01   Nama Pasien            `John Anderson`                    Kritis
-  A-02   Nama Dokter            `Michael Johnson`                  Tinggi
-  A-03   Alamat                 `25 Main Street, Boston`           Kritis
-  A-04   Email                  `john@gmail.com`                   Tinggi
-  A-05   Nomor Telepon          `+1 212-555-0187`                  Tinggi
-  A-06   ID Pasien/Medis        `PAT-20260715`, `MRN-20260715`     Kritis
-  A-07   Teks Klinis            Rekam medis pasien                 Kritis
-  A-08   Token Pseudonimisasi   `[PATIENT_001]`                    Tinggi
-  A-09   Pemetaan Token         `PATIENT_001 -> John Anderson`     Kritis
-  A-10   Data Mapping Redis     Pemetaan asli/token                Kritis
-  A-11   Request API            Request redaksi/pemulihan          Tinggi
-  A-12   Log Aplikasi           Informasi pemrosesan/aktivitas     Tinggi
-  A-13   Metrik                 Jumlah entitas/durasi pemrosesan   Sedang
+ID Aset Contoh Sensitivitas
+
+---
+
+A-01 Nama Pasien `John Anderson` Kritis
+A-02 Nama Dokter `Michael Johnson` Tinggi
+A-03 Alamat `25 Main Street, Boston` Kritis
+A-04 Email `john@gmail.com` Tinggi
+A-05 Nomor Telepon `+1 212-555-0187` Tinggi
+A-06 ID Pasien/Medis `PAT-20260715`, `MRN-20260715` Kritis
+A-07 Teks Klinis Rekam medis pasien Kritis
+A-08 Token Pseudonimisasi `[PATIENT_001]` Tinggi
+A-09 Pemetaan Token `PATIENT_001 -> John Anderson` Kritis
+A-10 Data Mapping Redis Pemetaan asli/token Kritis
+A-11 Request API Request redaksi/pemulihan Tinggi
+A-12 Log Aplikasi Informasi pemrosesan/aktivitas Tinggi
+A-13 Metrik Jumlah entitas/durasi pemrosesan Sedang
 
 ### Aset Kritis: Pemetaan Token
 
 Aset paling sensitif adalah hubungan antara token dan nilai aslinya:
 
-``` text
+```text
 PATIENT_001 -> John Anderson
 ```
 
 Token teredaksi saja tidak secara langsung menampilkan nama pasien:
 
-``` text
+```text
 [PATIENT_001]
 ```
 
@@ -138,7 +140,7 @@ Namun, jika mapping diperoleh attacker, pseudonimisasi dapat dibalik.
 Karena itu, Redis dan Mapping Service merupakan komponen keamanan
 bernilai tinggi.
 
-------------------------------------------------------------------------
+---
 
 ## 3. Threat Actor
 
@@ -148,10 +150,10 @@ Mencoba berinteraksi dengan API tanpa otorisasi.
 
 Tujuan yang mungkin:
 
--   mengirim masukan berbahaya;
--   menghabiskan sumber daya;
--   menyalahgunakan endpoint;
--   memperoleh PHI/PII.
+- mengirim masukan berbahaya;
+- menghabiskan sumber daya;
+- menyalahgunakan endpoint;
+- memperoleh PHI/PII.
 
 ### TA-02 --- Pengguna Aplikasi Tanpa Otorisasi
 
@@ -165,10 +167,10 @@ container Redis.
 
 Tujuan yang mungkin:
 
--   membaca mapping Redis;
--   memperoleh credential;
--   memeriksa konfigurasi;
--   mengekstraksi data.
+- membaca mapping Redis;
+- memperoleh credential;
+- memeriksa konfigurasi;
+- mengekstraksi data.
 
 ### TA-04 --- Konsumen Downstream Berbahaya atau Terkompromi
 
@@ -180,7 +182,7 @@ telah diproses.
 Pengguna internal yang memiliki akses resmi tetapi sengaja mengakses
 mapping atau log sensitif.
 
-------------------------------------------------------------------------
+---
 
 ## 4. Batas Kepercayaan
 
@@ -205,11 +207,11 @@ Ini merupakan batas penyimpanan paling kritis.
 
 **Risiko:** PHI/PII yang tidak terdeteksi dapat melewati batas privasi.
 
-------------------------------------------------------------------------
+---
 
 ## 5. Permukaan Serangan
 
-``` text
+```text
                     Front-End
                        |
                        v
@@ -240,57 +242,61 @@ Permukaan serangan utama:
 9.  Konfigurasi dan credential.
 10. Integrasi LLM downstream.
 
-------------------------------------------------------------------------
+---
 
 ## 6. Matriks Ancaman
 
-  -----------------------------------------------------------------------------------------------
-  ID          Ancaman                  Komponen        STRIDE        Dampak           Risiko
-  ----------- ------------------------ --------------- ------------- ---------------- -----------
-  T-01        Mapping Redis terekspos  Redis           Information   Pengungkapan     Kritis
-                                                       Disclosure    PHI/PII          
+---
 
-  T-02        Restore tanpa izin       Restore API     Elevation of  Pemulihan        Kritis
-                                                       Privilege /   PHI/PII asli     
-                                                       Information                    
-                                                       Disclosure                     
+ID Ancaman Komponen STRIDE Dampak Risiko
 
-  T-03        Kegagalan deteksi        Regex /         Information   PHI/PII masuk    Kritis
-                                       Presidio / NLP  Disclosure    downstream       
+---
 
-  T-04        Masukan berukuran besar  API / NLP       Denial of     Penggunaan       Tinggi
-                                                       Service       sumber daya      
-                                                                     berlebihan       
+T-01 Mapping Redis terekspos Redis Information Pengungkapan Kritis
+Disclosure PHI/PII
 
-  T-05        Logging data sensitif    Log             Information   Kebocoran        Tinggi
-                                                       Disclosure    PHI/PII sekunder 
+T-02 Restore tanpa izin Restore API Elevation of Pemulihan Kritis
+Privilege / PHI/PII asli  
+ Information  
+ Disclosure
 
-  T-06        Mapping token bocor      Pseudonymizer / Information   Pseudonimisasi   Tinggi
-                                       Mapping Service Disclosure    dapat dibalik    
+T-03 Kegagalan deteksi Regex / Information PHI/PII masuk Kritis
+Presidio / NLP Disclosure downstream
 
-  T-07        Redis persistence        Redis / Storage Information   Pemetaan         Kritis
-              terekspos                                Disclosure    historis         
-                                                                     terekspos        
+T-04 Masukan berukuran besar API / NLP Denial of Penggunaan Tinggi
+Service sumber daya  
+ berlebihan
 
-  T-08        False positive           Entity          Tampering /   Modifikasi data  Sedang
-                                       Processor       Integrity     tidak diperlukan 
+T-05 Logging data sensitif Log Information Kebocoran Tinggi
+Disclosure PHI/PII sekunder
 
-  T-09        Penyalahgunaan endpoint  FastAPI         Spoofing /    Pemrosesan tanpa Tinggi
-              API                                      Elevation of  izin             
-                                                       Privilege                      
+T-06 Mapping token bocor Pseudonymizer / Information Pseudonimisasi Tinggi
+Mapping Service Disclosure dapat dibalik
 
-  T-10        Penyalahgunaan unggah    Front-End / API Denial of     Penyalahgunaan   Tinggi
-              file                                     Service /     sumber daya      
-                                                       Tampering                      
+T-07 Redis persistence Redis / Storage Information Pemetaan Kritis
+terekspos Disclosure historis  
+ terekspos
 
-  T-11        Credential/konfigurasi   Docker /        Information   Kompromi         Kritis
-              terekspos                Environment     Disclosure    infrastruktur    
+T-08 False positive Entity Tampering / Modifikasi data Sedang
+Processor Integrity tidak diperlukan
 
-  T-12        PHI/PII tersisa masuk    Batas LLM       Information   Pengungkapan     Kritis
-              LLM                                      Disclosure    data sensitif    
-  -----------------------------------------------------------------------------------------------
+T-09 Penyalahgunaan endpoint FastAPI Spoofing / Pemrosesan tanpa Tinggi
+API Elevation of izin  
+ Privilege
 
-------------------------------------------------------------------------
+T-10 Penyalahgunaan unggah Front-End / API Denial of Penyalahgunaan Tinggi
+file Service / sumber daya  
+ Tampering
+
+T-11 Credential/konfigurasi Docker / Information Kompromi Kritis
+terekspos Environment Disclosure infrastruktur
+
+T-12 PHI/PII tersisa masuk Batas LLM Information Pengungkapan Kritis
+LLM Disclosure data sensitif
+
+---
+
+---
 
 ## 7. Analisis Ancaman
 
@@ -298,7 +304,7 @@ Permukaan serangan utama:
 
 Redis dapat berisi:
 
-``` text
+```text
 PATIENT_001 -> John Anderson
 PATIENT_002 -> Sarah Williams
 DOCTOR_001  -> Michael Johnson
@@ -314,20 +320,20 @@ langsung dengan Redis; Mapping Service menjadi perantara.
 
 **Kontrol yang direkomendasikan:**
 
--   Autentikasi dan otorisasi Redis.
--   Isolasi pada jaringan internal.
--   Jangan mengekspos Redis secara publik.
--   Lindungi credential.
--   Batasi akses administratif.
--   Pantau akses tanpa izin.
--   Gunakan enkripsi jika diperlukan.
+- Autentikasi dan otorisasi Redis.
+- Isolasi pada jaringan internal.
+- Jangan mengekspos Redis secara publik.
+- Lindungi credential.
+- Batasi akses administratif.
+- Pantau akses tanpa izin.
+- Gunakan enkripsi jika diperlukan.
 
 ### T-02 --- Restore Tanpa Otorisasi
 
 Restore memang dirancang untuk mengembalikan nilai asli. Attacker dapat
 mencoba:
 
-``` text
+```text
 [PATIENT_001]
 [DOCTOR_001]
 [ADDRESS_001]
@@ -339,18 +345,18 @@ untuk memperoleh PHI/PII asli.
 
 **Kontrol yang direkomendasikan:**
 
--   Autentikasi kuat.
--   Otorisasi restore.
--   Isolasi mapping berdasarkan user/session.
--   Audit logging.
--   Rate limiting.
--   Validasi token secara ketat.
+- Autentikasi kuat.
+- Otorisasi restore.
+- Isolasi mapping berdasarkan user/session.
+- Audit logging.
+- Rate limiting.
+- Validasi token secara ketat.
 
 ### T-03 --- Kegagalan Deteksi
 
 Detector dapat gagal mengenali:
 
-``` text
+```text
 Patient John Anderson
 ```
 
@@ -363,18 +369,18 @@ Detector, Address Detector, Resolver, dan Normalizer.
 
 **Kontrol yang direkomendasikan:**
 
--   Layered detection.
--   Pengujian false negative.
--   Pengujian format tidak biasa.
--   Pengujian nomor telepon/identifier internasional.
--   Monitoring cakupan deteksi.
--   Fail-safe untuk entitas yang tidak pasti.
+- Layered detection.
+- Pengujian false negative.
+- Pengujian format tidak biasa.
+- Pengujian nomor telepon/identifier internasional.
+- Monitoring cakupan deteksi.
+- Fail-safe untuk entitas yang tidak pasti.
 
 ### T-04 --- Masukan Berukuran Besar
 
 Attacker dapat mengirim dokumen klinis besar secara berulang sehingga:
 
-``` text
+```text
 Regex -> Presidio -> NLP -> Resolver -> Normalizer -> Pseudonymizer -> Redis
 ```
 
@@ -384,12 +390,12 @@ menggunakan CPU, memory, dan waktu secara berlebihan.
 
 **Kontrol yang direkomendasikan:**
 
--   Batas ukuran request/file.
--   Rate limiting.
--   Timeout.
--   Batas concurrency.
--   Monitoring sumber daya.
--   Penolakan request yang terlalu besar.
+- Batas ukuran request/file.
+- Rate limiting.
+- Timeout.
+- Batas concurrency.
+- Monitoring sumber daya.
+- Penolakan request yang terlalu besar.
 
 ### T-05 --- Logging Data Sensitif
 
@@ -398,7 +404,7 @@ sengaja menyimpan teks asli ke log.
 
 Contoh tidak aman:
 
-``` text
+```text
 Patient John Anderson
 john@gmail.com
 +1 212-555-0187
@@ -408,25 +414,25 @@ john@gmail.com
 
 **Kontrol yang direkomendasikan:**
 
--   Jangan mencatat teks klinis mentah.
--   Jangan mencatat nilai entitas asli.
--   Sanitasi exception message.
--   Batasi akses log.
--   Tetapkan retensi log.
--   Audit perilaku logging.
+- Jangan mencatat teks klinis mentah.
+- Jangan mencatat nilai entitas asli.
+- Sanitasi exception message.
+- Batasi akses log.
+- Tetapkan retensi log.
+- Audit perilaku logging.
 
 ### T-06 --- Pemetaan Token Bocor
 
 Token:
 
-``` text
+```text
 [PATIENT_001]
 [PATIENT_002]
 ```
 
 menjadi sensitif ketika dikombinasikan dengan:
 
-``` text
+```text
 PATIENT_001 -> John Anderson
 PATIENT_002 -> Sarah Williams
 ```
@@ -445,18 +451,18 @@ mapping historis.
 
 **Kontrol yang direkomendasikan:**
 
--   Lindungi Redis persistence.
--   Amankan backup.
--   Batasi akses volume.
--   Enkripsi backup.
--   Tetapkan retensi/penghapusan.
--   Batasi akses host Docker.
+- Lindungi Redis persistence.
+- Amankan backup.
+- Batasi akses volume.
+- Enkripsi backup.
+- Tetapkan retensi/penghapusan.
+- Batasi akses host Docker.
 
 ### T-08 --- False Positive
 
 Nilai normal dapat salah diklasifikasikan:
 
-``` text
+```text
 [ADDRESS_001]
 ```
 
@@ -467,16 +473,16 @@ overlap/prioritas dan Normalizer mengelompokkan entitas.
 
 **Kontrol yang direkomendasikan:**
 
--   Pengukuran precision/recall.
--   Penambahan kasus validasi.
--   Evaluasi confidence threshold.
--   Pengujian teks ambigu.
+- Pengukuran precision/recall.
+- Penambahan kasus validasi.
+- Evaluasi confidence threshold.
+- Pengujian teks ambigu.
 
 ### T-09 --- Penyalahgunaan Endpoint API
 
 Pemanggilan berulang atau tanpa izin terhadap:
 
-``` text
+```text
 POST /redact
 POST /restore
 ```
@@ -488,13 +494,13 @@ pengungkapan informasi.
 
 **Kontrol yang direkomendasikan:**
 
--   Autentikasi.
--   Otorisasi.
--   Rate limiting.
--   Validasi request.
--   Audit logging.
--   CORS yang aman.
--   HTTPS pada deployment.
+- Autentikasi.
+- Otorisasi.
+- Rate limiting.
+- Validasi request.
+- Audit logging.
+- CORS yang aman.
+- HTTPS pada deployment.
 
 ### T-10 --- Penyalahgunaan Unggah File
 
@@ -505,12 +511,12 @@ rusak, atau dikirim berulang.
 
 **Kontrol yang direkomendasikan:**
 
--   Validasi file.
--   Batas ukuran.
--   Timeout.
--   Pembersihan temporary file.
--   Penanganan nama file yang aman.
--   Rate limiting.
+- Validasi file.
+- Batas ukuran.
+- Timeout.
+- Pembersihan temporary file.
+- Penanganan nama file yang aman.
+- Rate limiting.
 
 ### T-11 --- Credential atau Konfigurasi Terekspos
 
@@ -521,18 +527,18 @@ source code, `.env`, Git history, Docker, atau log.
 
 **Kontrol yang direkomendasikan:**
 
--   Environment variable atau secret manager.
--   `.gitignore` untuk secret lokal.
--   Rotasi credential.
--   Jangan commit production secret.
--   Batasi akses environment container.
--   Periksa Git history untuk secret.
+- Environment variable atau secret manager.
+- `.gitignore` untuk secret lokal.
+- Rotasi credential.
+- Jangan commit production secret.
+- Batasi akses environment container.
+- Periksa Git history untuk secret.
 
 ### T-12 --- PHI/PII Tersisa Masuk ke LLM
 
 Jika detection gagal:
 
-``` text
+```text
 Clinical Text
      |
      v
@@ -548,38 +554,40 @@ LLM
 
 **Kontrol yang direkomendasikan:**
 
--   Perlakukan redaksi sebagai security boundary.
--   Layered detection.
--   Validasi output akhir.
--   Fail-safe untuk entitas yang tidak pasti.
--   Data minimization.
--   Monitoring aliran data downstream.
+- Perlakukan redaksi sebagai security boundary.
+- Layered detection.
+- Validasi output akhir.
+- Fail-safe untuk entitas yang tidak pasti.
+- Data minimization.
+- Monitoring aliran data downstream.
 
-------------------------------------------------------------------------
+---
 
 ## 8. Pemetaan Kontrol Keamanan
 
-  Kontrol                         Ancaman
-  ------------------------------- -------------------------------------------
-  Regex + Presidio + Custom NLP   T-03, T-08, T-12
-  Resolver / priority handling    T-03, T-08
-  Normalizer                      T-03, T-08
-  Pseudonymization                T-03, T-06, T-12
-  Mapping Service                 T-01, T-02, T-06
-  Redis isolation                 T-01, T-07
-  Input validation                T-04, T-10
-  File validation                 T-10
-  Metrics Service                 Mendukung monitoring dan analisis anomali
-  Response schema                 Mengontrol struktur response API
-  Validation testing              T-03, T-08, T-09, T-10
+Kontrol Ancaman
 
-------------------------------------------------------------------------
+---
+
+Regex + Presidio + Custom NLP T-03, T-08, T-12
+Resolver / priority handling T-03, T-08
+Normalizer T-03, T-08
+Pseudonymization T-03, T-06, T-12
+Mapping Service T-01, T-02, T-06
+Redis isolation T-01, T-07
+Input validation T-04, T-10
+File validation T-10
+Metrics Service Mendukung monitoring dan analisis anomali
+Response schema Mengontrol struktur response API
+Validation testing T-03, T-08, T-09, T-10
+
+---
 
 ## 9. Abuse Case
 
 ### Abuse Case 1 --- Akses Redis Langsung
 
-``` text
+```text
 Attacker
    |
    v
@@ -593,7 +601,7 @@ PATIENT_001 -> John Anderson
 
 ### Abuse Case 2 --- Penyalahgunaan Restore
 
-``` text
+```text
 Attacker
    |
    v
@@ -610,7 +618,7 @@ Nama Pasien Asli
 
 ### Abuse Case 3 --- Bypass Detection
 
-``` text
+```text
 Format PHI/PII yang dibuat khusus
           |
           v
@@ -624,7 +632,7 @@ Informasi asli tetap berada di teks
 
 ### Abuse Case 4 --- Resource Exhaustion
 
-``` text
+```text
 Attacker
    |
    v
@@ -639,7 +647,7 @@ CPU / Memory exhaustion
 
 **Tujuan:** menurunkan ketersediaan layanan.
 
-------------------------------------------------------------------------
+---
 
 ## 10. Prioritas Risiko
 
@@ -664,7 +672,7 @@ Pemrosesan NLP dapat membutuhkan sumber daya komputasi yang besar.
 
 Informasi sensitif dapat bocor di luar pipeline utama.
 
-------------------------------------------------------------------------
+---
 
 ## 11. Risiko Residual
 
@@ -673,7 +681,7 @@ Risiko residual terpenting adalah **ketidakpastian deteksi**.
 Tidak ada regex, model NER, atau detector berbasis aturan yang dapat
 menjamin seluruh kemungkinan representasi PHI/PII akan selalu dikenali.
 
-``` text
+```text
 Deteksi
     !=
 Jaminan Privasi Mutlak
@@ -683,7 +691,7 @@ Privacy Shield LLM harus diperlakukan sebagai lapisan perlindungan
 privasi dengan pendekatan defense-in-depth, bukan jaminan absolut bahwa
 seluruh data sensitif selalu akan terdeteksi.
 
-------------------------------------------------------------------------
+---
 
 ## 12. Rekomendasi Keamanan
 
@@ -705,13 +713,13 @@ Untuk deployment production:
 13. Tetapkan kebijakan retensi dan penghapusan mapping sensitif.
 14. Lanjutkan pengujian false negative dan false positive.
 
-------------------------------------------------------------------------
+---
 
 ## 13. Kesimpulan Model Ancaman
 
 Hubungan keamanan paling kritis dalam Privacy Shield LLM adalah:
 
-``` text
+```text
 Pseudonymized Token
         |
         v
@@ -724,7 +732,7 @@ Original PHI/PII
 Arsitektur mengurangi paparan langsung dengan mengubah data sensitif
 menjadi token:
 
-``` text
+```text
 John Anderson
       |
       v
@@ -733,7 +741,7 @@ John Anderson
 
 Namun:
 
-``` text
+```text
 PATIENT_001 -> John Anderson
 ```
 
@@ -741,19 +749,19 @@ tetap harus dilindungi sebagai informasi yang sangat sensitif.
 
 Area keamanan utama adalah:
 
--   Restore endpoint.
--   Redis mapping store.
--   Detection pipeline.
--   API input.
--   File upload.
--   Application logs.
--   Docker/configuration environment.
--   Batas integrasi LLM downstream.
+- Restore endpoint.
+- Redis mapping store.
+- Detection pipeline.
+- API input.
+- File upload.
+- Application logs.
+- Docker/configuration environment.
+- Batas integrasi LLM downstream.
 
 Keamanan tidak dapat hanya bergantung pada pseudonimisasi. Sistem
 membutuhkan defense-in-depth pada seluruh alur:
 
-``` text
+```text
 Input
   ↓
 Detection

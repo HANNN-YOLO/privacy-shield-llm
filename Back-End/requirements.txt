@@ -1,8 +1,0 @@
-fastapi
-uvicorn
-spacy
-click
-presidio-analyzer
-presidio-anonymizer
-redis[hiredis]
-python-dotenv

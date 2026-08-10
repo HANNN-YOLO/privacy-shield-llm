@@ -1,68 +1,68 @@
 # privacy-shield-llm
 
-An automated HealthTech security pipeline that detects and redacts Protected Health Information (PHI) and Personally Identifiable Information (PII) before data is processed by Large Language Models (LLMs), enabling secure, privacy-preserving, and compliant AI applications.
+Pipeline keamanan HealthTech otomatis yang mendeteksi dan melakukan redaksi terhadap Protected Health Information (PHI) dan Personally Identifiable Information (PII) sebelum data diproses oleh Large Language Models (LLMs), sehingga mendukung aplikasi AI yang aman, menjaga privasi, dan memenuhi kebutuhan kepatuhan.
 
-## 1. Project Overview
+## 1. Gambaran Umum Proyek
 
-**privacy-shield-llm** is a HealthTech security pipeline designed to reduce the risk of exposing sensitive PHI/PII to LLM-based applications.
+**privacy-shield-llm** adalah pipeline keamanan HealthTech yang dirancang untuk mengurangi risiko tereksposnya data PHI/PII sensitif ke aplikasi berbasis LLM.
 
-The pipeline combines:
+Pipeline menggabungkan:
 
-- FastAPI for the API layer
-- Regex-based detection for structured PII
-- spaCy and Microsoft Presidio for NLP-based entity detection
-- Pseudonymization for sensitive entities
-- Redis for token mapping and reverse mapping
-- Docker for containerized deployment
-- Automated testing and CI/CD for validation
+- FastAPI untuk lapisan API
+- Regex untuk mendeteksi PII terstruktur
+- spaCy dan Microsoft Presidio untuk deteksi entitas berbasis NLP
+- Pseudonymization untuk entitas sensitif
+- Redis untuk token mapping dan reverse mapping
+- Docker untuk deployment berbasis container
+- Automated testing dan CI/CD untuk validasi
 
-The main processing flow is:
+Alur utama sistem:
 
 ```text
-Input Clinical Text
+Clinical Text
+    |
+    v
+Deteksi PII/PHI
+   |          |
+ Regex       NLP
+   |          |
+   +----+-----+
         |
         v
-PII/PHI Detection
-   |            |
- Regex          NLP
-   |            |
-   +-----+------+
-         |
-         v
 Pseudonymization / Redaction
-         |
-         v
+        |
+        v
 Sanitized Text
-         |
-         v
+        |
+        v
 LLM Processing
-         |
-         v
+        |
+        v
 Reverse Mapping
-         |
-         v
+        |
+        v
 Restored Response
 ```
 
-## 2. System Overview
+## 2. Gambaran Sistem
 
-The system separates detection, transformation, mapping, and restoration into dedicated components.
+Sistem memisahkan proses deteksi, transformasi, mapping, dan restoration ke dalam komponen yang berbeda.
 
 ### Detection Layer
 
-Structured entities such as email addresses, phone numbers, dates, and IDs are detected using regular expressions.
+Entitas terstruktur seperti email, nomor telepon, tanggal, dan ID dideteksi menggunakan regular expression.
 
-NLP-based detection is used for contextual entities such as:
+Deteksi berbasis NLP digunakan untuk entitas yang membutuhkan konteks, seperti:
 
-- Patient names
-- Doctor names
-- Organizations
-- Addresses and locations
-- Other context-dependent entities
+- Nama pasien
+- Nama dokter
+- Organisasi
+- Alamat dan lokasi
+- Entitas lain yang bergantung pada konteks
 
 ### Pseudonymization Layer
 
-Detected sensitive values can be replaced with stable tokens such as:
+Data sensitif yang terdeteksi dapat diganti dengan token yang stabil, misalnya:
 
 ```text
 John Doe       -> [PATIENT_001]
@@ -72,9 +72,9 @@ john@email.com -> [EMAIL_001]
 
 ### Redis Mapping Layer
 
-Redis stores the relationship between original values and generated tokens so that the sanitized text can later be restored.
+Redis menyimpan hubungan antara nilai asli dan token yang dihasilkan sehingga teks yang telah disanitasi dapat dikembalikan jika diperlukan.
 
-The mapping service supports:
+Mapping mendukung:
 
 ```text
 Original Entity -> Token
@@ -83,77 +83,77 @@ Token           -> Original Entity
 
 ### Reverse Mapping
 
-After LLM processing, tokens in the response can be mapped back to their original values through Redis.
+Setelah proses LLM selesai, token pada response dapat dikembalikan ke nilai aslinya menggunakan Redis.
 
-This keeps sensitive information separated from the LLM processing stage.
+Dengan demikian, informasi sensitif tetap dipisahkan dari tahap pemrosesan LLM.
 
 ## 3. Docker Deployment
 
-The project provides Docker configuration for running the application and Redis in containers.
+Project menyediakan konfigurasi Docker untuk menjalankan aplikasi dan Redis menggunakan container.
 
-Build the application image:
+Build image aplikasi:
 
 ```bash
 docker build -t privacy-shield-llm:latest .
 ```
 
-Run the application container according to the project's Docker configuration.
+Jalankan application container sesuai konfigurasi Docker project.
 
-For the Redis service, Docker Compose is provided.
+Untuk Redis, project menyediakan Docker Compose.
 
 ## 4. Redis Setup
 
-Redis is used as the persistent mapping store for pseudonymization and reverse mapping.
+Redis digunakan sebagai penyimpanan mapping untuk proses pseudonymization dan reverse mapping.
 
-Start Redis:
+Jalankan Redis:
 
 ```bash
 docker compose up -d redis
 ```
 
-Check the container:
+Periksa container:
 
 ```bash
 docker compose ps
 ```
 
-View Redis logs:
+Lihat log Redis:
 
 ```bash
 docker compose logs -f redis
 ```
 
-Test the Redis connection:
+Tes koneksi Redis:
 
 ```bash
 docker exec -it privacy-shield-redis redis-cli ping
 ```
 
-Expected result:
+Hasil yang diharapkan:
 
 ```text
 PONG
 ```
 
-Stop Redis:
+Hentikan Redis:
 
 ```bash
 docker compose stop redis
 ```
 
-Remove the Redis container:
+Hapus container:
 
 ```bash
 docker compose down
 ```
 
-The Redis data is stored in the `redis_data` Docker volume.
+Data Redis disimpan di Docker volume `redis_data`.
 
-## 5. Environment Configuration
+## 5. Konfigurasi Environment
 
-Sensitive configuration values are loaded through environment variables.
+Konfigurasi sensitif dimuat melalui environment variables.
 
-Example:
+Contoh:
 
 ```env
 REDIS_HOST=localhost
@@ -162,15 +162,15 @@ REDIS_DB=0
 REDIS_PASSWORD=
 ```
 
-For containerized execution, the environment variables can be supplied through Docker Compose.
+Untuk menjalankan project menggunakan container, environment variables dapat diberikan melalui Docker Compose.
 
-Do not commit the real `.env` file or credentials to the repository.
+Jangan commit file `.env` asli atau credential ke repository.
 
-Use `.env.example` when sharing the required configuration structure.
+Gunakan `.env.example` jika ingin membagikan struktur konfigurasi yang dibutuhkan.
 
-## 6. Project Structure
+## 6. Struktur Project
 
-A simplified project structure is:
+Struktur sederhana project:
 
 ```text
 privacy-shield-llm/
@@ -199,44 +199,44 @@ privacy-shield-llm/
 └── README-ID.md
 ```
 
-The exact implementation may evolve as the project progresses.
+Struktur implementasi dapat berubah seiring perkembangan project.
 
-## 7. Security Considerations
+## 7. Pertimbangan Keamanan
 
-The pipeline is designed around the principle of minimizing sensitive data exposure before LLM processing.
+Pipeline dirancang berdasarkan prinsip meminimalkan paparan data sensitif sebelum data diproses oleh LLM.
 
-Key security considerations include:
+Pertimbangan keamanan utama:
 
-- Detect PHI/PII before sending data to an LLM.
-- Keep original sensitive values outside the LLM-facing text whenever possible.
-- Use pseudonymous tokens instead of raw sensitive values.
-- Store token mappings in Redis rather than exposing the mapping to the LLM.
-- Protect Redis credentials through environment variables.
-- Do not commit `.env` files containing secrets.
-- Validate input and output data.
-- Test duplicate entities to ensure mapping consistency.
-- Test unknown tokens and missing mappings safely.
-- Consider Redis persistence, access control, network isolation, and credential protection in production.
+- Deteksi PHI/PII sebelum data dikirim ke LLM.
+- Usahakan nilai sensitif asli tidak masuk ke teks yang diproses LLM.
+- Gunakan token pseudonymous sebagai pengganti nilai sensitif.
+- Simpan mapping token di Redis dan jangan mengekspos mapping tersebut ke LLM.
+- Lindungi credential Redis menggunakan environment variables.
+- Jangan commit file `.env` yang berisi secret.
+- Lakukan validasi terhadap input dan output.
+- Uji entity yang sama secara berulang untuk memastikan mapping tetap konsisten.
+- Uji unknown token dan mapping yang hilang agar dapat ditangani dengan aman.
+- Untuk production, pertimbangkan persistence Redis, access control, network isolation, dan perlindungan credential.
 
 ## 8. Threat Model
 
-The project's security analysis is documented separately.
+Analisis keamanan project disimpan secara terpisah.
 
-- [Threat Model — English](Threat-model-EN.md)
+- [Threat Model — Indonesia](Threat-model-ID.md)
 
-The threat model focuses specifically on security risks relevant to the HealthTech PHI/PII redaction pipeline, including sensitive-data exposure, unauthorized mapping access, LLM-related risks, Redis security, and pipeline integrity.
+Threat model berfokus pada risiko keamanan yang berkaitan dengan pipeline redaction PHI/PII HealthTech, termasuk kebocoran data sensitif, akses mapping tanpa izin, risiko yang berkaitan dengan LLM, keamanan Redis, dan integritas pipeline.
 
-## 9. Documentation
+## 9. Dokumentasi
 
-Additional project documentation is maintained separately from the main README.
+Dokumentasi tambahan project disimpan secara terpisah dari README utama.
 
-Important documentation includes:
+Dokumentasi utama meliputi:
 
-- Threat Model — English
-- System Validation & Performance Testing — English
+- Threat Model — Indonesia
+- System Validation & Performance Testing — Indonesia
 - Development and learning notes
 
-## 10. Project Information
+## 10. Informasi Project
 
 **Project:** HealthTech — Automated PHI/PII Redaction Pipeline for LLMs
 
@@ -244,13 +244,13 @@ Important documentation includes:
 
 **Technology:** Python, FastAPI, spaCy, Microsoft Presidio, Redis, Docker
 
-**Purpose:** Protect sensitive HealthTech data before it is processed by LLM-based applications.
+**Purpose:** Melindungi data sensitif HealthTech sebelum diproses oleh aplikasi berbasis LLM.
 
-## 11. Development Schedule
+## 11. Jadwal Pengembangan
 
 ### Bootcamp Preparation
 
-| Date          | Activity          |
+| Tanggal       | Aktivitas         |
 | ------------- | ----------------- |
 | June 06, 2026 | On Boarding       |
 | July 13, 2026 | Division of Tasks |
@@ -259,7 +259,7 @@ Important documentation includes:
 
 **July 13 – July 20, 2026**
 
-| Date    | Activity                                                                                         | Commit                                                                                  |
+| Tanggal | Aktivitas                                                                                        | Commit                                                                                  |
 | ------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
 | July 13 | Day 1 - API Architecture Research & REST API Fundamentals                                        | `docs: add FastAPI architecture and REST API learning notes`                            |
 | July 14 | Day 2 - FastAPI Project Initialization                                                           | `feat: initialize FastAPI project structure and development environment`                |
@@ -273,7 +273,7 @@ Important documentation includes:
 
 **July 20 – July 27, 2026**
 
-| Date    | Activity                                         | Commit                                                                                           |
+| Tanggal | Aktivitas                                        | Commit                                                                                           |
 | ------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
 | July 20 | Day 8 - Fundamental Regex Pattern Research       | `docs: add regex learning examples and validation patterns`                                      |
 | July 21 | Day 9 - Email Detection Module                   | `feat: implement email detection using regex`                                                    |
@@ -287,7 +287,7 @@ Important documentation includes:
 
 **July 27 – August 2, 2026**
 
-| Date     | Activity                                                    | Commit                                                                            |
+| Tanggal  | Aktivitas                                                   | Commit                                                                            |
 | -------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | July 27  | Day 15 - NLP & NER Research                                 | `docs: add NLP and named entity recognition learning notes`                       |
 | July 28  | Day 16 - spaCy Integration                                  | `feat: integrate spaCy named entity recognition`                                  |
@@ -301,7 +301,7 @@ Important documentation includes:
 
 **August 3 – August 9, 2026**
 
-| Date     | Activity                                                                    | Commit                                                               |
+| Tanggal  | Aktivitas                                                                   | Commit                                                               |
 | -------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | August 3 | Day 22 - Pseudonymization Engine                                            | `feat: implement pseudonymization engine for sensitive entities`     |
 | August 4 | Day 23 - Redis Token Mapping Service                                        | `feat: implement Redis-based token mapping service`                  |
@@ -315,11 +315,11 @@ Important documentation includes:
 
 ## 12. Testing
 
-Testing documentation is maintained separately for the English and Indonesian versions.
+Dokumentasi testing disimpan secara terpisah untuk versi English dan Indonesia.
 
-- [System Validation & Performance Testing — English](System%20Validation%20%26%20Performance%20Testing-EN.md)
+- [System Validation & Performance Testing — Indonesia](System%20Validation%20%26%20Performance%20Testing-ID.md)
 
-The testing scope includes functional validation, duplicate entity mapping, clinical input testing, performance testing, reverse mapping, unknown tokens, empty input, and Redis mapping behavior.
+Testing mencakup functional validation, duplicate entity mapping, clinical input testing, performance testing, reverse mapping, unknown tokens, empty input, dan Redis mapping behavior.
 
 ---
 
