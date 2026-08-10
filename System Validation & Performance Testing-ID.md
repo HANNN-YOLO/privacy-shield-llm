@@ -120,15 +120,15 @@ Sistem harus mampu:
 
 **Hasil penyamaran:**
 
-![Hasil penyamaran kasus banyak entitas](images/Week%204/Functional%20Testing/case%202%20-%20medium/redacted%20text.png)
+![Hasil penyamaran kasus banyak entitas](images/Week%204/Functional%20Testing/case%202%20-%20mixed%20entity/redacted%20text.png)
 
 **Bukti Redis:**
 
-![Bukti Redis kasus banyak entitas](images/Week%204/Functional%20Testing/case%202%20-%20medium/redis%20server.png)
+![Bukti Redis kasus banyak entitas](images/Week%204/Functional%20Testing/case%202%20-%20mixed%20entity/redis%20server.png)
 
 **Hasil pemulihan:**
 
-![Hasil pemulihan kasus banyak entitas](images/Week%204/Functional%20Testing/case%202%20-%20medium/restored%20text.png)
+![Hasil pemulihan kasus banyak entitas](images/Week%204/Functional%20Testing/case%202%20-%20mixed%20entity/restored%20text.png)
 
 ### Kesimpulan
 
@@ -323,7 +323,7 @@ Sistem tetap dapat memproses masukan tanpa menghasilkan token yang tidak diperlu
 
 ### Bukti
 
-![Validasi teks normal](images/Week%204/Validation%20Testing/case%202%20-%20normal%20text/redacted%20text.png)
+![Validasi teks normal](images/Week%204/Validation%20Testing/case%202%20-%20normal%20text/redacrted%20text.png)
 
 ### Kesimpulan
 
@@ -367,7 +367,7 @@ Sistem tetap memberikan respons yang stabil dan tidak mengalami kegagalan proses
 
 ### Bukti
 
-![Validasi teks tidak dikenal](images/Week%204/Validation%20Testing/case%204%20-%20unknown%20text/restored%20text.png)
+![Validasi teks tidak dikenal](images/Week%204/Validation%20Testing/case%204%20-%20uknown%20text/restored%20text.png)
 
 ### Kesimpulan
 
@@ -391,7 +391,7 @@ Sistem menolak pemrosesan dan memberikan respons validasi yang sesuai.
 
 ### Bukti
 
-![Pemulihan kosong](images/Week%204/Validation%20Testing/case%205%20-%20empty%20restore/restored%20text.png)
+![Pemulihan kosong](images/Week%204/Validation%20Testing/case%205%20-%20empty%20redis/restored%20text.png)
 
 ### Kesimpulan
 

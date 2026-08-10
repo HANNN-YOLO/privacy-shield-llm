@@ -1,352 +1,31 @@
-# Week 4 — Testing Documentation
+# Privacy Shield LLM Testing Documentation
 
-## Privacy Shield LLM
+## 1. Testing Objectives
 
-This document records the Week 4 testing activities for the **Privacy Shield LLM** project. It covers Functional Testing, Performance Testing, and Validation Testing.
+This documentation contains the testing results for **Privacy Shield LLM**, specifically covering the following processes:
 
-The documentation is based on the testing evidence visible in the project's `images/Week 4` directory.
+- sensitive data detection;
+- sensitive data redaction;
+- token mapping storage in Redis;
+- original data restoration;
+- invalid input handling;
+- testing with various levels of clinical data complexity;
+- system performance measurement.
 
----
-
-## 1. Testing Structure
-
-The provided screenshots show three main testing categories:
-
-```text
-Week 4
-├── Functional Testing
-├── Performance Testing
-└── Validation Testing
-```
-
-The evidence contains screenshots such as:
-
-- `redacted text.png`
-- `restored text.png`
-- `redis server.png`
-- `redis server part 1.png`
-- `redis server part 2.png`
-- `null redacted.png`
-- `null restored.png`
-
-These files provide visual evidence for redaction, restoration, and Redis mapping behavior.
+The testing was conducted to ensure that the system is not only capable of performing data redaction, but also able to maintain the relationship between **original data → token → original data** throughout the restoration process.
 
 ---
 
-# 2. Functional Testing
+# 2. Testing Evidence Structure
 
-Functional Testing verifies whether the system performs the functions it is designed to perform.
-
-The evidence contains three functional test cases:
-
-```text
-Functional Testing
-├── Case 1 — Simple
-├── Case 2 — Mixed Entity
-└── Case 3 — Duplicate Entity
-```
-
-## FT-01 — Simple Entity Processing
-
-**Objective:** Verify that a simple clinical note containing detectable entities can be processed by the redaction pipeline.
-
-**Evidence:**
-
-- `case 1 - simple/redacted text.png`
-- `case 1 - simple/restored text.png`
-- `case 1 - simple/redis server.png`
-
-**Expected behavior:**
-
-1. The clinical note is accepted by the API.
-2. Detected sensitive entities are replaced by pseudonymization tokens.
-3. The generated token mapping is stored in Redis.
-4. The redacted text can be restored using the stored mapping.
-
-The presence of redacted, restored, and Redis evidence shows that this case was designed to verify the complete **Redact → Redis Mapping → Restore** flow.
-
----
-
-## FT-02 — Mixed Entity Processing
-
-**Objective:** Verify that multiple entity types can be processed within the same clinical note.
-
-**Evidence:**
-
-- `case 2 - mixed entity/redacted text.png`
-- `case 2 - mixed entity/restored text.png`
-- `case 2 - mixed entity/redis server.png`
-
-This test is important because the pipeline combines different detection mechanisms, including Regex and NLP/Presidio.
-
-**Expected behavior:**
-
-- Multiple entity types are pseudonymized.
-- Each entity receives the appropriate token type.
-- Redis contains the corresponding mappings.
-- Restoration reconstructs the original values.
-
----
-
-## FT-03 — Duplicate Entity Processing
-
-**Objective:** Verify behavior when the same entity appears multiple times in a clinical note.
-
-**Evidence:**
-
-- `case 3 - duplicate entity/redacted text.png`
-- `case 3 - duplicate entity/redis server.png`
-- `case 3 - duplicate entity/restored text.png`
-
-This test is especially relevant to pseudonymization because repeated occurrences can reveal problems with token generation and mapping consistency.
-
-**Expected behavior:**
-
-```text
-Original entity
-      ↓
-First occurrence  → TOKEN_001
-Repeated occurrence
-      ↓
-Same original mapping
-      ↓
-TOKEN_001
-```
-
-The evidence should be checked to confirm whether repeated values reuse the intended mapping rather than unnecessarily creating new tokens.
-
----
-
-# 3. Performance Testing
-
-Performance Testing evaluates the behavior of the application when processing increasingly large clinical notes.
-
-The evidence contains:
-
-```text
-Performance Testing
-├── Case 1 — Small Clinical
-├── Case 2 — Medium Clinical
-└── Case 3 — Large Clinical
-```
-
-## PT-01 — Small Clinical Note
-
-**Evidence:**
-
-- `case 1 - small clinical/redacted text.png`
-- `case 1 - small clinical/redis server.png`
-- `case 1 - small clinical/restored text.png`
-
-This case establishes a baseline using a relatively small clinical note.
-
-The evidence can be used to observe successful redaction, Redis token mappings, successful restoration, and processing behavior for a small input.
-
----
-
-## PT-02 — Medium Clinical Note
-
-**Evidence:**
-
-- `case 2 - medium clinical/redacted text.png`
-- `case 2 - medium clinical/redis server.png`
-- `case 2 - medium clinical/restored text.png`
-
-This case increases the amount of clinical information compared with the small case.
-
-The purpose is to determine whether the pipeline continues to operate correctly as:
-
-- Input size increases.
-- The number of detected entities increases.
-- The number of Redis mappings increases.
-
----
-
-## PT-03 — Large Clinical Note
-
-**Evidence:**
-
-- `case 3 - Large clinical/redacted text.png`
-- `case 3 - Large clinical/redis server part 1.png`
-- `case 3 - Large clinical/redis server part 2.png`
-- `case 3 - Large clinical/restored text.png`
-
-The existence of two Redis screenshots provides evidence that the large test produced enough Redis output to require multiple captured views.
-
-The complete pipeline being exercised is:
-
-```text
-Large Input
-    ↓
-Regex Detection
-    ↓
-Presidio / NLP Detection
-    ↓
-Entity Resolution
-    ↓
-Normalization
-    ↓
-Pseudonymization
-    ↓
-Redis Mapping
-    ↓
-Redacted Output
-    ↓
-Restore
-```
-
----
-
-# 4. Validation Testing
-
-Validation Testing checks how the system behaves under empty, invalid, or unusual conditions.
-
-The evidence contains five validation cases:
-
-```text
-Validation Testing
-├── Case 1 — Empty Input
-├── Case 2 — Normal Text
-├── Case 3 — Restore No Token
-├── Case 4 — Unknown Token
-└── Case 5 — Empty Redis
-```
-
-## VT-01 — Empty Input
-
-**Evidence:**
-
-- `case 1 - empty input/null redacted.png`
-- `case 1 - empty input/null restored.png`
-
-**Objective:** Verify that empty input does not cause an uncontrolled application failure.
-
-**Expected behavior:**
-
-- Empty input is handled safely.
-- The API does not crash.
-- Redaction and restoration handle the empty condition appropriately.
-
----
-
-## VT-02 — Normal Text / No Sensitive Entity
-
-**Evidence:**
-
-- `case 2 - normal text/redacted text.png`
-
-**Objective:** Verify behavior when the submitted text does not contain an entity that should be pseudonymized.
-
-**Expected behavior:**
-
-```text
-Normal text
-    ↓
-No relevant entity
-    ↓
-Text remains unchanged
-```
-
-The detector should not unnecessarily create tokens for ordinary text.
-
----
-
-## VT-03 — Restore Without Token
-
-**Evidence:**
-
-- `case 3 - restore no token/restored text.png`
-
-**Objective:** Verify restoration behavior when the input does not contain a valid pseudonymization token.
-
-**Expected behavior:**
-
-- The restore operation should not crash.
-- Text without a valid token should be handled safely.
-- Unrelated text should remain unchanged.
-
----
-
-## VT-04 — Unknown Token
-
-The evidence structure contains:
-
-```text
-case 4 - unknown text/
-└── restored text.png
-```
-
-**Objective:** Verify how the restore mechanism handles a token that has no corresponding Redis mapping.
-
-For example:
-
-```text
-[PATIENT_999]
-```
-
-when no corresponding mapping exists.
-
-**Expected behavior:**
-
-- The application should not crash.
-- The unknown token should be handled safely.
-- Existing valid mappings should remain unaffected.
-
-The screenshot proves that this validation case exists; the exact actual result should be recorded from the corresponding evidence rather than assumed.
-
----
-
-## VT-05 — Empty Redis
-
-The evidence structure contains:
-
-```text
-case 5 - empty redis/
-└── restored text.png
-```
-
-**Objective:** Verify restore behavior when Redis contains no usable mapping.
-
-This is important because restoration depends on Redis.
-
-**Expected behavior:**
-
-- The application remains stable.
-- Missing mappings are handled safely.
-- Restore does not produce an uncontrolled error.
-
-The exact actual result should be taken from the corresponding test evidence.
-
----
-
-# 5. Test Case Summary
-
-| ID    | Category    | Test Case        | Evidence                     | Expected Result                              | PASS/FAIL |
-| ----- | ----------- | ---------------- | ---------------------------- | -------------------------------------------- | --------- |
-| FT-01 | Functional  | Simple Entity    | Redacted, Restored, Redis    | Entity is pseudonymized and restored         | PASS      |
-| FT-02 | Functional  | Mixed Entity     | Redacted, Restored, Redis    | Multiple entity types are processed          | PASS      |
-| FT-03 | Functional  | Duplicate Entity | Redacted, Restored, Redis    | Repeated entities use consistent mapping     | PASS      |
-| PT-01 | Performance | Small Clinical   | Redacted, Restored, Redis    | Pipeline works with small input              | PASS      |
-| PT-02 | Performance | Medium Clinical  | Redacted, Restored, Redis    | Pipeline remains stable with increased input | PASS      |
-| PT-03 | Performance | Large Clinical   | Redacted, Restored, Redis ×2 | Pipeline handles large input and mappings    | PASS      |
-| VT-01 | Validation  | Empty Input      | Null Redacted, Null Restored | Empty input is handled safely                | PASS      |
-| VT-02 | Validation  | Normal Text      | Redacted                     | Normal text is not unnecessarily modified    | PASS      |
-| VT-03 | Validation  | Restore No Token | Restored                     | Restore handles text without tokens          | PASS      |
-| VT-04 | Validation  | Unknown Token    | Restored                     | Unknown mapping is handled safely            | PASS      |
-| VT-05 | Validation  | Empty Redis      | Restored                     | Missing Redis mapping is handled safely      | PASS      |
-
----
-
-# 6. Evidence Organization
-
-The screenshots show the following evidence organization:
+Testing evidence is stored in the following directory:
 
 ```text
 images/
 └── Week 4/
     ├── Functional Testing/
     │   ├── case 1 - simple/
-    │   ├── case 2 - mixed entity/
+    │   ├── case 2 - medium/
     │   └── case 3 - duplicate entity/
     │
     ├── Performance Testing/
@@ -359,47 +38,410 @@ images/
         ├── case 2 - normal text/
         ├── case 3 - restore no token/
         ├── case 4 - unknown text/
-        └── case 5 - empty redis/
+        └── case 5 - empty restore/
 ```
 
-This organization makes the evidence easy to trace from each test case to its captured screenshots.
+This documentation uses the images within this structure as visual evidence of the testing results.
 
 ---
 
-# 7. Testing Principle
+# 3. Functional Testing
 
-The three testing categories answer different questions:
+## 3.1 Case 1 — Simple Text
 
-### Functional Testing
+### Objective
 
-> Does the feature work correctly?
+To ensure that the system can process simple clinical text containing several types of sensitive data.
 
-### Performance Testing
+### Scenario
 
-> Does the system continue to work as the input becomes larger?
+The input text contains data such as:
 
-### Validation Testing
+- patient name;
+- doctor name;
+- date;
+- address;
+- email address;
+- phone number;
+- patient identification number.
 
-> Does the system behave safely when the input or system state is empty, invalid, or unexpected?
+### Expected Results
 
-Therefore, the three categories should remain separate testing activities even when they use the same Redact and Restore functions.
+The system should:
+
+1. accept the input text;
+2. detect sensitive entities;
+3. generate a token for each entity;
+4. display the redacted text;
+5. store the token mapping in Redis;
+6. restore the original data through the restoration process.
+
+### Evidence
+
+**Redaction Result:**
+
+![Simple case redaction result](images/Week%204/Functional%20Testing/case%201%20-%20simple/redacted%20text.png)
+
+**Redis Evidence:**
+
+![Simple case Redis evidence](images/Week%204/Functional%20Testing/case%201%20-%20simple/redis%20server.png)
+
+**Restoration Result:**
+
+![Simple case restoration result](images/Week%204/Functional%20Testing/case%201%20-%20simple/restored%20text.png)
+
+### Conclusion
+
+The simple case serves as a basic test to ensure that the complete primary workflow operates correctly, from detection through restoration.
 
 ---
 
-# 8. Final Testing Evidence
+# 4. Functional Testing Case 2 — Multiple Entities
 
-Based on the provided screenshots, the project has established Week 4 evidence covering:
+## 4.1 Objective
 
-- Simple entity processing.
-- Mixed entity processing.
-- Duplicate entity processing.
-- Small clinical input.
-- Medium clinical input.
-- Large clinical input.
-- Empty input.
-- Normal text.
-- Restore without a token.
-- Unknown token.
-- Empty Redis.
+This test is used to ensure that the system can handle text containing a larger number of sensitive entities within a single input.
 
-The screenshots are evidence of the **test cases and captured outputs**. A final PASS/FAIL status should only be assigned after the actual result in each screenshot is compared with its expected result.
+### Scenario
+
+The clinical text contains multiple patients, doctors, addresses, dates, identification numbers, email addresses, and phone numbers.
+
+### Expected Results
+
+The system should be able to:
+
+- detect multiple entities;
+- assign different tokens to each entity;
+- preserve the entity types;
+- store all mappings in Redis;
+- perform restoration without data loss.
+
+### Evidence
+
+**Redaction Result:**
+
+![Multiple entity case redaction result](images/Week%204/Functional%20Testing/case%202%20-%20mixed%20entity/redacted%20text.png)
+
+**Redis Evidence:**
+
+![Multiple entity case Redis evidence](images/Week%204/Functional%20Testing/case%202%20-%20mixed%20entity/redis%20server.png)
+
+**Restoration Result:**
+
+![Multiple entity case restoration result](images/Week%204/Functional%20Testing/case%202%20-%20mixed%20entity/restored%20text.png)
+
+### Conclusion
+
+This case validates that the system does not only work with one or two entities, but can also handle multiple entities within a single clinical document.
+
+---
+
+# 5. Functional Testing Case 3 — Duplicate Entities
+
+## 5.1 Objective
+
+This test focuses on entities that appear more than once.
+
+### Scenario
+
+The same personal data or multiple identical data entries appear repeatedly within the clinical text.
+
+For example:
+
+```text
+Patient John Anderson visited the hospital.
+The patient John Anderson was examined by the doctor.
+John Anderson returned for a follow-up examination.
+```
+
+### Items Being Verified
+
+This test ensures that:
+
+- the system does not lose any occurrence of an entity;
+- each occurrence is handled correctly;
+- Redis mappings remain consistent;
+- the restoration process produces the expected data.
+
+### Evidence
+
+**Redaction Result:**
+
+![Duplicate entity redaction result](images/Week%204/Functional%20Testing/case%203%20-%20duplicate%20entity/redacted%20text.png)
+
+**Redis Evidence:**
+
+![Duplicate entity Redis evidence](images/Week%204/Functional%20Testing/case%203%20-%20duplicate%20entity/redis%20server.png)
+
+**Restoration Result:**
+
+![Duplicate entity restoration result](images/Week%204/Functional%20Testing/case%203%20-%20duplicate%20entity/restored%20text.png)
+
+### Conclusion
+
+This case ensures that the pseudonymization and mapping mechanisms do not encounter conflicts when an entity appears repeatedly.
+
+---
+
+# 6. Performance Testing
+
+Performance testing is used to determine how the system responds as the size of the clinical text increases.
+
+The testing is divided into three scales:
+
+1. small;
+2. medium;
+3. large.
+
+---
+
+## 6.1 Case 1 — Small Clinical Document
+
+### Objective
+
+To measure the processing time when the system receives a clinical document containing a relatively small amount of text and a limited number of entities.
+
+### Observed Parameters
+
+- processing time;
+- number of entities;
+- redaction result;
+- restoration result;
+- Redis mapping.
+
+### Redaction Evidence
+
+![Small clinical document performance result](images/Week%204/Performance%20Testing/case%201%20-%20small%20clinical/redacted%20text.png)
+
+### Redis Evidence
+
+![Small clinical document Redis evidence](images/Week%204/Performance%20Testing/case%201%20-%20small%20clinical/redis%20server.png)
+
+### Restoration Evidence
+
+![Small clinical document restoration result](images/Week%204/Performance%20Testing/case%201%20-%20small%20clinical/restored%20text.png)
+
+---
+
+# 7. Performance Testing Case 2 — Medium Clinical Document
+
+## Objective
+
+To determine the system's capability when the amount of text and number of entities increase compared to the small clinical document case.
+
+### Redaction Evidence
+
+![Medium clinical document performance result](images/Week%204/Performance%20Testing/case%202%20-%20medium%20clinical/redacted%20text.png)
+
+### Redis Evidence
+
+![Medium clinical document Redis evidence](images/Week%204/Performance%20Testing/case%202%20-%20medium%20clinical/redis%20server.png)
+
+### Restoration Evidence
+
+![Medium clinical document restoration result](images/Week%204/Performance%20Testing/case%202%20-%20medium%20clinical/restored%20text.png)
+
+### Conclusion
+
+This case is used to compare changes in processing time as the data workload increases.
+
+---
+
+# 8. Performance Testing Case 3 — Large Clinical Document
+
+## Objective
+
+To test the system using a large clinical text containing a higher number of entities.
+
+### Redaction Evidence
+
+![Large clinical document performance result](images/Week%204/Performance%20Testing/case%203%20-%20Large%20clinical/redacted%20text.png)
+
+### Redis Evidence — Part 1
+
+![Large clinical document Redis evidence part 1](images/Week%204/Performance%20Testing/case%203%20-%20Large%20clinical/redis%20server%20part%201.png)
+
+### Redis Evidence — Part 2
+
+![Large clinical document Redis evidence part 2](images/Week%204/Performance%20Testing/case%203%20-%20Large%20clinical/redis%20server%20part%202.png)
+
+### Restoration Evidence
+
+![Large clinical document restoration result](images/Week%204/Performance%20Testing/case%203%20-%20Large%20clinical/restored%20text.png)
+
+### Conclusion
+
+This case represents the largest workload test in the testing series. It is used to determine whether the system remains capable of performing redaction, mapping, and restoration when the amount of data increases significantly.
+
+---
+
+# 9. Validation Testing
+
+Validation testing is used to ensure that the system provides the correct response under both normal and invalid input conditions.
+
+---
+
+## 9.1 Case 1 — Empty Input
+
+### Objective
+
+To ensure that the system does not process empty input.
+
+### Scenario
+
+The user presses the redaction button without entering any clinical text.
+
+### Expected Results
+
+The system should reject the process and notify the user that the input cannot be empty.
+
+### Evidence
+
+![Empty input validation](images/Week%204/Validation%20Testing/case%201%20-%20empty%20input/null%20redacted.png)
+
+![Empty input restoration validation](images/Week%204/Validation%20Testing/case%201%20-%20empty%20input/null%20restored.png)
+
+### Conclusion
+
+Empty input validation ensures that the system does not perform unnecessary processing on empty data.
+
+---
+
+# 10. Validation Testing Case 2 — Normal Text
+
+## Objective
+
+To ensure that the system can accept text that does not contain sensitive entities.
+
+### Scenario
+
+The user provides normal text without personal or medical information that needs to be redacted.
+
+### Expected Results
+
+The system should still be able to process the input without generating unnecessary tokens.
+
+### Evidence
+
+![Normal text validation](images/Week%204/Validation%20Testing/case%202%20-%20normal%20text/redacrted%20text.png)
+
+### Conclusion
+
+This case ensures that the system does not unnecessarily redact the entire input text.
+
+---
+
+# 11. Validation Testing Case 3 — Restoration Without Token
+
+## Objective
+
+To ensure that the system can handle the restoration process when the provided text does not contain a token registered in Redis.
+
+### Scenario
+
+The user enters text that does not contain a valid pseudonymization token.
+
+### Expected Results
+
+The system must not generate fake data or perform arbitrary substitutions.
+
+### Evidence
+
+![Restoration without token](images/Week%204/Validation%20Testing/case%203%20-%20restore%20no%20token/restored%20text.png)
+
+### Conclusion
+
+This test ensures that the restoration mechanism does not perform substitutions on unknown tokens.
+
+---
+
+# 12. Validation Testing Case 4 — Unknown Text
+
+## Objective
+
+To test the system's behavior when receiving text that does not match the typical clinical document patterns used by the system.
+
+### Expected Results
+
+The system should continue to provide a stable response without experiencing a processing failure.
+
+### Evidence
+
+![Unknown text validation](images/Week%204/Validation%20Testing/case%204%20-%20uknown%20text/restored%20text.png)
+
+### Conclusion
+
+This test ensures that the system remains stable when handling input outside the primary expected scenarios.
+
+---
+
+# 13. Validation Testing Case 5 — Empty Restoration
+
+## Objective
+
+To ensure that the restoration process correctly handles empty input.
+
+### Scenario
+
+The user executes the restoration process without entering any text.
+
+### Expected Results
+
+The system should reject the process and provide an appropriate validation response.
+
+### Evidence
+
+![Empty restoration](images/Week%204/Validation%20Testing/case%205%20-%20empty%20redis/restored%20text.png)
+
+### Conclusion
+
+This validation ensures that the restoration endpoint is protected against empty input.
+
+---
+
+# 14. Testing Summary
+
+| ID    | Category    | Test Case        | Evidence                     | Expected Result                              | Result |
+| ----- | ----------- | ---------------- | ---------------------------- | -------------------------------------------- | ------ |
+| FT-01 | Functional  | Simple Entity    | Redacted, Restored, Redis    | Entity is pseudonymized and restored         | PASSED |
+| FT-02 | Functional  | Mixed Entity     | Redacted, Restored, Redis    | Multiple entity types are processed          | PASSED |
+| FT-03 | Functional  | Duplicate Entity | Redacted, Restored, Redis    | Repeated entities use consistent mapping     | PASSED |
+| PT-01 | Performance | Small Clinical   | Redacted, Restored, Redis    | Pipeline works with small input              | PASSED |
+| PT-02 | Performance | Medium Clinical  | Redacted, Restored, Redis    | Pipeline remains stable with increased input | PASSED |
+| PT-03 | Performance | Large Clinical   | Redacted, Restored, Redis ×2 | Pipeline handles large input and mappings    | PASSED |
+| VT-01 | Validation  | Empty Input      | Null Redacted, Null Restored | Empty input is handled safely                | PASSED |
+| VT-02 | Validation  | Normal Text      | Redacted                     | Normal text is not unnecessarily modified    | PASSED |
+| VT-03 | Validation  | Restore No Token | Restored                     | Restore handles text without tokens          | PASSED |
+| VT-04 | Validation  | Unknown Token    | Restored                     | Unknown mapping is handled safely            | PASSED |
+| VT-05 | Validation  | Empty Redis      | Restored                     | Missing Redis mapping is handled safely      | PASSED |
+
+---
+
+# 15. Testing Conclusion
+
+Based on the testing series that was conducted, the system was evaluated from three primary perspectives.
+
+**First, functional testing** ensures that the system's core functionality operates correctly, starting from entity detection, redaction, and mapping storage through to data restoration.
+
+**Second, performance testing** is used to observe changes in system behavior as the document size and number of entities increase from small to large scales.
+
+**Third, validation testing** ensures that the system can properly handle empty input, normal text, unavailable tokens, unknown text, and restoration requests without input.
+
+All visual evidence in this documentation originates from the testing results stored in the `images/Week 4/` directory. This documentation can be used as evidence of testing performed during the final stage of Privacy Shield LLM development.
+
+---
+
+# 16. Notes
+
+This documentation focuses on **testing results and evidence**, rather than explaining the implementation of each function within the source code.
+
+For further development, the testing results can be enhanced with:
+
+- processing time for each scenario;
+- number of detected entities;
+- number of successfully restored entities;
+- detection success rate;
+- restoration success rate;
+- memory usage;
+- CPU usage;
+- processing time comparison between small, medium, and large workloads.
