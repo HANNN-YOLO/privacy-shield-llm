@@ -322,4 +322,4 @@ Testing mencakup functional validation, duplicate entity mapping, clinical input
 ---
 
 **Project:** privacy-shield-llm  
-**HealthTech Security Pipeline — PHI/PII Protection for LLM Applications V0.18.7**
+**HealthTech Security Pipeline — PHI/PII Protection for LLM Applications V0.18.8**
