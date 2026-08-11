@@ -301,17 +301,15 @@ Dokumentasi utama meliputi:
 
 **August 3 – August 9, 2026**
 
-| Tanggal  | Aktivitas                                                                   | Commit                                                               |
-| -------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| August 3 | Day 22 - Pseudonymization Engine                                            | `feat: implement pseudonymization engine for sensitive entities`     |
-| August 4 | Day 23 - Redis Token Mapping Service                                        | `feat: implement Redis-based token mapping service`                  |
-| August 5 | Day 24 - Reverse Mapping Integration                                        | `feat: integrate reverse mapping into LLM response pipeline`         |
-| August 6 | Day 25 - System Validation & Performance Testing                            | `test: validate end-to-end pipeline performance and reverse mapping` |
-| August 7 | Day 26 - Threat Modeling & Security Analysis for PHI/PII Redaction Pipeline | `docs: add HealthTech PII threat modeling`                           |
-| August 8 | Day 27 - Project Documentation, Architecture & Security Report              | `docs: finalize project documentation`                               |
-
-<!--
-| July 04, 2026 | Day 28 | Final Documentation & Project Integration | -->
+| Tanggal   | Aktivitas                                                                   | Commit                                                               |
+| --------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| August 3  | Day 22 - Pseudonymization Engine                                            | `feat: implement pseudonymization engine for sensitive entities`     |
+| August 4  | Day 23 - Redis Token Mapping Service                                        | `feat: implement Redis-based token mapping service`                  |
+| August 5  | Day 24 - Reverse Mapping Integration                                        | `feat: integrate reverse mapping into LLM response pipeline`         |
+| August 6  | Day 25 - System Validation & Performance Testing                            | `test: validate end-to-end pipeline performance and reverse mapping` |
+| August 7  | Day 26 - Threat Modeling & Security Analysis for PHI/PII Redaction Pipeline | `docs: add HealthTech PII threat modeling`                           |
+| August 8  | Day 27 - Project Documentation, Architecture & Security Report              | `docs: finalize project documentation`                               |
+| August 09 | Day 28 - Documentation in Week 4                                            | `docs: documentation in Week 4`                                      |
 
 ## 12. Testing
 
@@ -324,4 +322,4 @@ Testing mencakup functional validation, duplicate entity mapping, clinical input
 ---
 
 **Project:** privacy-shield-llm  
-**HealthTech Security Pipeline — PHI/PII Protection for LLM Applications**
+**HealthTech Security Pipeline — PHI/PII Protection for LLM Applications V0.18.3**

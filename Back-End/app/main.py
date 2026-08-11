@@ -51,6 +51,5 @@ def root():
     return {
         "application": "Privacy Shield LLM",
         "status": "Running",
-        "version": "0.5.0"
-        # 0.18.2
+        "version": "0.18.3"
     }
