@@ -619,7 +619,6 @@ Pertimbangan keamanan utama meliputi:
 
 Analisis keamanan project didokumentasikan secara terpisah.
 
-- [Threat Model — English](Threat-model-EN.md)
 - [Threat Model — Indonesian](Threat-model-ID.md)
 
 Threat model berfokus pada risiko keamanan yang relevan terhadap pipeline redaction PHI/PII HealthTech, termasuk:
@@ -642,9 +641,8 @@ Dokumentasi tambahan project dikelola secara terpisah dari README utama.
 
 Dokumentasi penting meliputi:
 
-- Threat Model — English
 - Threat Model — Indonesian
-- System Validation & Performance Testing — English
+- System Validation & Performance Testing — Indonesian
 - Development and learning notes
 
 Dokumentasi mencakup architecture, security considerations, testing, performance measurements, dan development process project.
@@ -688,6 +686,8 @@ Dokumentasi mencakup architecture, security considerations, testing, performance
 | July 18 | Day 6 - Building Front-End, Refactor Back-End, Connected Between Front-End & Back-End using CORS | `refactor: organize project into routes schemas and services`                           |
 | July 19 | Day 7 - API Testing & Documentation in Week 1                                                    | `test: verify API endpoints and update Postman documentation & documentation in Week 1` |
 
+---
+
 ### Week 2 — Regex Detection
 
 **July 20 – July 27, 2026**
@@ -702,6 +702,8 @@ Dokumentasi mencakup architecture, security considerations, testing, performance
 | July 25 | Day 13 - Regex Detection Pipeline                | `feat: integrate regex detectors into detection pipeline`                                        |
 | July 26 | Day 14 - Regex Testing & Documentation in Week 2 | `test: validate regex detection pipeline with sample clinical notes and documentation in week 2` |
 
+---
+
 ### Week 3 — NLP Detection
 
 **July 27 – August 2, 2026**
@@ -715,6 +717,8 @@ Dokumentasi mencakup architecture, security considerations, testing, performance
 | July 31   | Day 19 - Address Entity Detection                           | `feat: implement address and location entity detection`                           |
 | August 01 | Day 20 - Context-Aware Detection                            | `feat: improve contextual entity recognition for medical terms`                   |
 | August 02 | Day 21 - NLP Pipeline Integration & Documentation in Week 3 | `feat: integrate NLP detection into redaction pipeline & documentation in week 3` |
+
+---
 
 ### Week 4 — Integration & Deployment
 
@@ -736,7 +740,7 @@ Dokumentasi mencakup architecture, security considerations, testing, performance
 
 Dokumentasi testing dikelola secara terpisah untuk versi English dan Indonesian.
 
-- [System Validation & Performance Testing — English](System%20Validation%20%26%20Performance%20Testing-EN.md)
+- [System Validation & Performance Testing — Indonesian](System%20Validation%20%26%20Performance%20Testing-ID.md)
 
 Testing mencakup:
 
