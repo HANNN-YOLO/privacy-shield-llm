@@ -1,91 +1,468 @@
 # privacy-shield-llm
 
-An automated HealthTech security pipeline that detects and redacts Protected Health Information (PHI) and Personally Identifiable Information (PII) before data is processed by Large Language Models (LLMs), enabling secure, privacy-preserving, and compliant AI applications.
+An automated HealthTech security pipeline designed to detect, pseudonymize, redact, map, and restore Protected Health Information (PHI) and Personally Identifiable Information (PII) from clinical text through a structured and measurable processing pipeline.
+
+The system combines rule-based detection, NLP-based entity recognition, entity processing, pseudonymization, Redis-based token mapping, restoration, and processing metrics to provide a secure and auditable PHI/PII protection workflow.
+
+---
 
 ## 1. Project Overview
 
-**privacy-shield-llm** is a HealthTech security pipeline designed to reduce the risk of exposing sensitive PHI/PII to LLM-based applications.
+**privacy-shield-llm** is a HealthTech security pipeline designed to reduce the risk of exposing sensitive PHI/PII during clinical text processing.
 
-The pipeline combines:
+The pipeline separates the processing workflow into several dedicated stages:
 
 - FastAPI for the API layer
 - Regex-based detection for structured PII
-- spaCy and Microsoft Presidio for NLP-based entity detection
+- Microsoft Presidio for NLP-based entity recognition
+- RecognizerResult processing for detected entities
+- Entity Processor for contextual PHI/PII classification
+- Resolver for entity resolution
+- Normalizer for entity normalization
 - Pseudonymization for sensitive entities
-- Redis for token mapping and reverse mapping
+- `redact_service` for the main redaction process
+- `mapping_service` for token/key storage and retrieval
+- Redis for persistent mapping storage
+- `restore_service` for restoring mapped entities
+- Metrics for processing-time and detection measurements
 - Docker for containerized deployment
 - Automated testing and CI/CD for validation
 
-The main processing flow is:
+The system consists of two primary processing flows:
+
+1. **Redact Flow**
+2. **Restore Flow**
+
+### Redact Flow
+
+The redaction process starts from the Front-End and passes through structured detection, NLP recognition, entity processing, normalization, pseudonymization, and finally the redaction service.
 
 ```text
-Input Clinical Text
-        |
-        v
-PII/PHI Detection
-   |            |
- Regex          NLP
-   |            |
-   +-----+------+
-         |
-         v
-Pseudonymization / Redaction
-         |
-         v
-Sanitized Text
-         |
-         v
-LLM Processing
-         |
-         v
-Reverse Mapping
-         |
-         v
-Restored Response
+                Input (Front-End)
+                        |
+                        v
+                Regex Detection
+            (EMAIL, DATE, PHONE, ID)
+                        |
+                        v
+                     Presidio
+                        |
+                        v
+                RecognizerResult
+                        |
+                        v
+                Entity Processor
+        (PATIENT, DOCTOR, ADDRESS, CONTEXT)
+                        |
+                        v
+                     Resolver
+                        |
+                        v
+                    Normalizer
+                        |
+                        v
+                Pseudonymization
+                        |
+                        v
+                redact_service
+                       / \
+                      /   \
+                     v     v
+                Metric   mapping_service
+                                |
+                                v
+                           Redis Storage
 ```
+
+The `redact_service` acts as the central processing point after pseudonymization.
+
+It produces two processing paths:
+
+- **Metric Path** — records processing time, PII/PHI detection information, and response-related metrics.
+- **Mapping Path** — sends generated keys/tokens to `mapping_service`, which stores the mapping in Redis.
+
+### Restore Flow
+
+The restore process retrieves the required mapping from Redis before restoring the pseudonymized entities.
+
+```text
+                Input (Front-End)
+                        |
+                        v
+                mapping_service
+                   (GET KEYS)
+                        |
+                        v
+                     Metric
+        (Processing Time & PII/PHI Detection)
+                        |
+                        v
+                restore_service
+                        |
+                        v
+                    Response
+```
+
+The restore process uses the mapping stored by the redaction workflow to restore the corresponding values before returning the response.
+
+---
 
 ## 2. System Overview
 
-The system separates detection, transformation, mapping, and restoration into dedicated components.
+The system separates detection, entity processing, transformation, mapping, restoration, and metrics into dedicated components.
 
 ### Detection Layer
 
-Structured entities such as email addresses, phone numbers, dates, and IDs are detected using regular expressions.
+The detection layer identifies structured and contextual PHI/PII from incoming clinical text.
 
-NLP-based detection is used for contextual entities such as:
+#### Regex Detection
 
-- Patient names
-- Doctor names
-- Organizations
-- Addresses and locations
-- Other context-dependent entities
+Regular expressions are used for structured identifiers such as:
+
+- Email addresses
+- Phone numbers
+- Dates
+- Identification numbers
+
+The initial detection flow is:
+
+```text
+                   Input Text
+                        |
+                        v
+                Regex Detection
+                        |
+                        +---- EMAIL
+                        +---- DATE
+                        +---- PHONE
+                        +---- ID
+```
+
+Regex detection provides a deterministic first layer for structured PII.
+
+#### Presidio Detection
+
+After the Regex Detection stage, the text is processed by Microsoft Presidio for NLP-based entity recognition.
+
+```text
+                Clinical Text
+                        |
+                        v
+                    Presidio
+                        |
+                        v
+                RecognizerResult
+```
+
+Presidio is responsible for identifying contextual entities that cannot reliably be detected using simple regular expressions.
+
+### RecognizerResult
+
+The detection result generated by Presidio is processed as `RecognizerResult`.
+
+These results provide the information required by the next stage of the pipeline for further entity processing.
+
+### Entity Processor
+
+The Entity Processor processes the output from `RecognizerResult` and converts detected entities into standardized internal categories based on predefined medical rules.
+
+The mapping logic is as follows:
+
+- `PERSON` → converted into `PATIENT` or `DOCTOR` depending on contextual role inference
+- `LOCATION`, `LOC`, `FAC`, `GPE` → converted into `ADDRESS`
+- `CONTEXT` → if the detected text represents a medical condition or disease name, the original value is preserved without anonymization
+
+This stage ensures that raw NLP outputs are normalized into domain-specific healthcare entities while preserving medically relevant context.
+
+### Resolver
+
+The Resolver processes and reconciles entity information coming from multiple detection sources (Regex and RecognizerResult + Entity Processor) and determines the final entity selection before normalization.
+
+The decision logic is defined as:
+
+- **Regex vs RecognizerResult conflict** → Regex entity takes priority
+- **RecognizerResult vs Entity Processor conflict** → Entity Processor output takes priority
+- **Final fallback condition** → if no conflict resolution rule applies, the system defaults to the original `RecognizerResult`
+
+```text
+                RecognizerResult
+                        |
+                        v
+                Entity Processor
+                        |
+                        v
+                    Resolver
+```
+
+### Normalizer
+
+The Normalizer standardizes the resolved entity information before it enters the pseudonymization stage.
+
+```text
+                     Resolver
+                        |
+                        v
+                   Normalizer
+                        |
+                        v
+                Pseudonymization
+```
+
+This ensures that the entity information is prepared consistently before generating pseudonymous representations.
+
+---
 
 ### Pseudonymization Layer
 
-Detected sensitive values can be replaced with stable tokens such as:
+Detected sensitive entities are transformed into pseudonymous values instead of exposing their original values directly.
+
+Example:
 
 ```text
-John Doe       -> [PATIENT_001]
-08123456789    -> [PHONE_001]
-john@email.com -> [EMAIL_001]
+John Doe        -> [PATIENT_001]
+08123456789     -> [PHONE_001]
+john@email.com  -> [EMAIL_001]
+123456789       -> [ID_001]
 ```
+
+The pseudonymized values are then passed to the `redact_service`.
+
+```text
+                Detected Entity
+                        |
+                        v
+                Pseudonymization
+                        |
+                        v
+                redact_service
+```
+
+The pseudonymization process preserves the ability to restore mapped values through the dedicated mapping and restore services.
+
+---
+
+### Redact Service
+
+The `redact_service` is responsible for handling the final redaction process after entity detection, processing, resolution, normalization, and pseudonymization.
+
+The service provides two processing paths:
+
+```text
+                    redact_service
+                    /             \
+                   /               \
+                  v                 v
+              Metric          mapping_service
+                                   |
+                                   v
+                                Redis
+```
+
+#### Metric Path
+
+The Metric component records information related to the redaction process, including:
+
+- Redaction processing time
+- Detection processing time
+- Detected PII/PHI information
+- Response-related processing information
+
+This allows the system to measure and evaluate the performance of the redaction pipeline.
+
+#### Mapping Path
+
+The mapping path sends pseudonymized entity mappings to the `mapping_service`.
+
+```text
+                Pseudonymized Entity
+                        |
+                        v
+                mapping_service
+                        |
+                        v
+                      Redis
+```
+
+---
 
 ### Redis Mapping Layer
 
-Redis stores the relationship between original values and generated tokens so that the sanitized text can later be restored.
+Redis is used as the persistent mapping storage for pseudonymized entities.
 
-The mapping service supports:
+The mapping service stores the relationship between generated keys/tokens and their corresponding values.
+
+Conceptually:
 
 ```text
-Original Entity -> Token
-Token           -> Original Entity
+                    KEY / TOKEN
+                        |
+                        v
+                Original Value
 ```
 
-### Reverse Mapping
+The mapping service is responsible for storing and retrieving these mappings.
 
-After LLM processing, tokens in the response can be mapped back to their original values through Redis.
+The mapping process is:
 
-This keeps sensitive information separated from the LLM processing stage.
+```text
+                redact_service
+                        |
+                        v
+                mapping_service
+                        |
+                        v
+                      Redis
+```
+
+During restoration, the mapping service retrieves the required keys:
+
+```text
+                    Front-End
+                        |
+                        v
+                mapping_service
+                        |
+                        v
+                     GET KEYS
+                        |
+                        v
+                      Redis
+```
+
+---
+
+Flow Reverse Mapping
+
+The reverse mapping process accepts a pseudonymized key/token from the Front-End and performs a lookup through mapping_service, which is responsible for retrieving the original value from Redis based on the stored token mapping generated during the Redact Flow.
+
+```text
+                Input (Front-End)
+                        |
+                        v
+                mapping_service
+               (GET KEY / TOKEN)
+                        |
+                        v
+                   Redis Lookup
+                        |
+                        v
+                Reverse Mapping
+                        |
+                        v
+                restore_service
+                        |
+                        v
+                      Metric
+        (Processing Time & PII/PHI Detection)
+                        |
+                        v
+                     Response
+```
+
+The Flow Reverse Mapping works by using the pseudonymized key/token as the lookup reference to retrieve the original value that was previously stored during the mapping stage in the Redact Flow.
+
+For example:
+
+```text
+             Input
+        [PATIENT_001]
+                |
+                v
+        mapping_service
+                |
+                v
+        Redis Lookup
+                |
+                v
+   [PATIENT_001] -> "John Doe"
+                |
+                v
+        Reverse Mapping
+                |
+                v
+        restore_service
+                |
+                v
+        Output:John Doe
+```
+
+Thus, the flow of the relationship between Redact Flow and Reverse Mapping is:
+
+```text
+                    REDACT FLOW
+                         |
+                         v
+                Pseudonymization
+                         |
+                         v
+                mapping_service
+                         |
+                         v
+                       Redis
+                         |
+                         |
+                    Stored Mapping
+                         |
+                         |
+                         v
+              REVERSE MAPPING FLOW
+                         |
+                         v
+                mapping_service
+                  (GET KEY/TOKEN)
+                         |
+                         v
+                  Redis Lookup
+                         |
+                         v
+                 Original Value
+                         |
+                         v
+                 restore_service
+                         |
+                         v
+                      Response
+```
+
+In this design, mapping_service is responsible for storing token mappings during Redact Flow and retrieving them during Reverse Mapping Flow, ensuring a consistent one-to-one relationship between pseudonymized tokens and their original PHI/PII values.
+
+In this implementation, Reverse Mapping does not require LLM integration. It is a direct mapping lookup mechanism that retrieves the original value associated with a pseudonymized key/token.
+
+### Metrics
+
+Metrics are integrated into both the redaction and restoration workflows.
+
+For the redaction process:
+
+```text
+                redact_service
+                        |
+                        v
+                      Metric
+```
+
+For the restoration process:
+
+```text
+                mapping_service
+                        |
+                        v
+                restore_service
+                        |
+                        v
+                     Metric
+```
+
+The metric system is used to measure:
+
+- Processing time
+- Detection processing
+- PII/PHI detection information
+- Response processing
+
+These measurements support system validation and performance evaluation.
+
+---
 
 ## 3. Docker Deployment
 
@@ -101,29 +478,31 @@ Run the application container according to the project's Docker configuration.
 
 For the Redis service, Docker Compose is provided.
 
+---
+
 ## 4. Redis Setup
 
-Redis is used as the persistent mapping store for pseudonymization and reverse mapping.
+Redis is used as the mapping storage for pseudonymization and restoration.
 
-Start Redis:
+### Start Redis
 
 ```bash
 docker compose up -d redis
 ```
 
-Check the container:
+### Check the Container
 
 ```bash
 docker compose ps
 ```
 
-View Redis logs:
+### View Redis Logs
 
 ```bash
 docker compose logs -f redis
 ```
 
-Test the Redis connection:
+### Test the Redis Connection
 
 ```bash
 docker exec -it privacy-shield-redis redis-cli ping
@@ -135,19 +514,21 @@ Expected result:
 PONG
 ```
 
-Stop Redis:
+### Stop Redis
 
 ```bash
 docker compose stop redis
 ```
 
-Remove the Redis container:
+### Remove the Redis Container
 
 ```bash
 docker compose down
 ```
 
 The Redis data is stored in the `redis_data` Docker volume.
+
+---
 
 ## 5. Environment Configuration
 
@@ -164,9 +545,11 @@ REDIS_PASSWORD=
 
 For containerized execution, the environment variables can be supplied through Docker Compose.
 
-Do not commit the real `.env` file or credentials to the repository.
+> **Security Note:** Do not commit the real `.env` file or credentials to the repository.
 
 Use `.env.example` when sharing the required configuration structure.
+
+---
 
 ## 6. Project Structure
 
@@ -201,30 +584,51 @@ privacy-shield-llm/
 
 The exact implementation may evolve as the project progresses.
 
+---
+
 ## 7. Security Considerations
 
-The pipeline is designed around the principle of minimizing sensitive data exposure before LLM processing.
+The pipeline is designed around minimizing the exposure of sensitive PHI/PII during clinical text processing.
 
 Key security considerations include:
 
-- Detect PHI/PII before sending data to an LLM.
-- Keep original sensitive values outside the LLM-facing text whenever possible.
-- Use pseudonymous tokens instead of raw sensitive values.
-- Store token mappings in Redis rather than exposing the mapping to the LLM.
-- Protect Redis credentials through environment variables.
+- Detect PHI/PII before sensitive data is processed further.
+- Use Regex for structured PII detection.
+- Use NLP-based recognition for contextual entities.
+- Process detected entities through dedicated entity-processing stages.
+- Use pseudonymous tokens instead of directly exposing sensitive values.
+- Store mapping information separately in Redis.
+- Restrict access to Redis credentials through environment variables.
 - Do not commit `.env` files containing secrets.
 - Validate input and output data.
 - Test duplicate entities to ensure mapping consistency.
 - Test unknown tokens and missing mappings safely.
+- Measure redaction and restoration processing time.
 - Consider Redis persistence, access control, network isolation, and credential protection in production.
+- Do not expose real PHI/PII in source code, documentation, testing data, screenshots, or repository commits.
+
+---
 
 ## 8. Threat Model
 
 The project's security analysis is documented separately.
 
 - [Threat Model — English](Threat-model-EN.md)
+- [Threat Model — Indonesian](Threat-model-ID.md)
 
-The threat model focuses specifically on security risks relevant to the HealthTech PHI/PII redaction pipeline, including sensitive-data exposure, unauthorized mapping access, LLM-related risks, Redis security, and pipeline integrity.
+The threat model focuses on security risks relevant to the HealthTech PHI/PII redaction pipeline, including:
+
+- Sensitive-data exposure
+- Unauthorized mapping access
+- PHI/PII detection bypass
+- Incorrect entity classification
+- Mapping security
+- Redis security
+- Data restoration risks
+- Pipeline integrity
+- Sensitive-data leakage through logs or documentation
+
+---
 
 ## 9. Documentation
 
@@ -233,18 +637,27 @@ Additional project documentation is maintained separately from the main README.
 Important documentation includes:
 
 - Threat Model — English
+- Threat Model — Indonesian
 - System Validation & Performance Testing — English
 - Development and learning notes
 
+The documentation covers the architecture, security considerations, testing, performance measurements, and development process of the project.
+
+---
+
 ## 10. Project Information
 
-**Project:** HealthTech — Automated PHI/PII Redaction Pipeline for LLMs
+**Project:** HealthTech — Automated PHI/PII Redaction Pipeline
 
 **Repository:** `privacy-shield-llm`
 
-**Technology:** Python, FastAPI, spaCy, Microsoft Presidio, Redis, Docker
+**Technology:** Python, FastAPI, Regex, Microsoft Presidio, Redis, Docker
 
-**Purpose:** Protect sensitive HealthTech data before it is processed by LLM-based applications.
+**Core Components:** Regex Detection, Presidio, RecognizerResult, Entity Processor, Resolver, Normalizer, Pseudonymization, Redact Service, Mapping Service, Restore Service, and Metrics
+
+**Purpose:** Detect, pseudonymize, redact, map, and restore sensitive PHI/PII through a structured and measurable security pipeline.
+
+---
 
 ## 11. Development Schedule
 
@@ -301,15 +714,17 @@ Important documentation includes:
 
 **August 3 – August 9, 2026**
 
-| Date      | Activity                                                                    | Commit                                                               |
-| --------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| August 03 | Day 22 - Pseudonymization Engine                                            | `feat: implement pseudonymization engine for sensitive entities`     |
-| August 04 | Day 23 - Redis Token Mapping Service                                        | `feat: implement Redis-based token mapping service`                  |
-| August 05 | Day 24 - Reverse Mapping Integration                                        | `feat: integrate reverse mapping into LLM response pipeline`         |
-| August 06 | Day 25 - System Validation & Performance Testing                            | `test: validate end-to-end pipeline performance and reverse mapping` |
-| August 07 | Day 26 - Threat Modeling & Security Analysis for PHI/PII Redaction Pipeline | `docs: add HealthTech PII threat modeling`                           |
-| August 08 | Day 27 - Project Documentation, Architecture & Security Report              | `docs: finalize project documentation`                               |
-| August 09 | Day 28 - Documentation in Week 4                                            | `docs: documentation in Week 4`                                      |
+| Date      | Activity                                                                    | Commit                                                                  |
+| --------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| August 03 | Day 22 - Pseudonymization Engine                                            | `feat: implement pseudonymization engine for sensitive entities`        |
+| August 04 | Day 23 - Redis Token Mapping Service                                        | `feat: implement Redis-based token mapping service`                     |
+| August 05 | Day 24 - Restore Mapping Integration                                        | `feat: integrate mapping retrieval into restore pipeline`               |
+| August 06 | Day 25 - System Validation & Performance Testing                            | `test: validate end-to-end pipeline performance and restore processing` |
+| August 07 | Day 26 - Threat Modeling & Security Analysis for PHI/PII Redaction Pipeline | `docs: add HealthTech PII threat modeling`                              |
+| August 08 | Day 27 - Project Documentation, Architecture & Security Report              | `docs: finalize project documentation`                                  |
+| August 09 | Day 28 - Documentation in Week 4                                            | `docs: documentation in Week 4`                                         |
+
+---
 
 ## 12. Testing
 
@@ -317,9 +732,124 @@ Testing documentation is maintained separately for the English and Indonesian ve
 
 - [System Validation & Performance Testing — English](System%20Validation%20%26%20Performance%20Testing-EN.md)
 
-The testing scope includes functional validation, duplicate entity mapping, clinical input testing, performance testing, reverse mapping, unknown tokens, empty input, and Redis mapping behavior.
+The testing scope includes:
+
+- Regex detection validation
+- Presidio entity detection
+- RecognizerResult processing
+- Entity Processor validation
+- Resolver validation
+- Normalizer validation
+- Pseudonymization validation
+- Duplicate entity mapping
+- Clinical input testing
+- Redaction processing time
+- PII/PHI detection metrics
+- Mapping service validation
+- Redis mapping behavior
+- Mapping key retrieval
+- Restore processing
+- Unknown tokens
+- Missing mappings
+- Empty input
+- Response validation
+- End-to-end redaction and restoration workflow
 
 ---
 
-**Project:** privacy-shield-llm  
-**HealthTech Security Pipeline — PHI/PII Protection for LLM Applications V0.18.8**
+## 🔐 Security Features
+
+- PHI/PII detection
+- Regex-based structured detection
+- NLP-based contextual entity detection
+- Patient and doctor name detection
+- Address and location detection
+- Context-aware medical entity detection
+- Pseudonymization
+- Redis-based token mapping
+- Reverse mapping
+- Docker containerization
+- CI/CD automation
+- Threat modeling
+- System validation and performance testing
+
+---
+
+## 📦 Project Deliverables
+
+- FastAPI backend
+- Front-End interface
+- Regex detection modules
+- Email detection
+- Phone detection
+- Date detection
+- ID detection
+- Microsoft Presidio integration
+- RecognizerResult processing
+- Entity Processor
+- Resolver
+- Normalizer
+- Pseudonymization engine
+- Redact Service
+- Mapping Service
+- Redis token/key mapping
+- Restore Service
+- Metrics and processing-time measurement
+- Docker configuration
+- Docker Compose configuration
+- GitHub Actions CI/CD
+- Docker Hub image
+- Threat Model
+- Architecture documentation
+- Testing documentation
+- Security report
+
+---
+
+## 🔮 Future Improvements
+
+- Advanced contextual PHI/PII detection
+- Improved entity resolution
+- Improved entity normalization
+- More comprehensive PHI/PII recognizers
+- Advanced pseudonymization strategies
+- Mapping expiration policies
+- Redis security hardening
+- Role-Based Access Control (RBAC)
+- Audit logging
+- Advanced performance monitoring
+- Monitoring and alerting
+- Kubernetes deployment
+- Cloud deployment
+- Additional security validation and compliance analysis
+
+---
+
+## 👥 Contributors
+
+| Member   | Responsibility                          |
+| -------- | --------------------------------------- |
+| Member 1 | FastAPI & API Layer                     |
+| Member 2 | Regex Detection                         |
+| Member 3 | NLP Detection                           |
+| Member 4 | Token Mapping, Integration & Deployment |
+
+---
+
+# License
+
+This project is developed for **educational purposes** as part of the **Infotact Technical Internship Program — Advanced Cybersecurity Project**.
+
+The project is intended for educational, development, testing, and cybersecurity engineering demonstration purposes.
+
+The implementation focuses on HealthTech PHI/PII protection through detection, pseudonymization, mapping, redaction, restoration, and performance measurement.
+
+**Project:** `privacy-shield-llm`
+
+**Project:** HealthTech — Automated PHI/PII Redaction Pipeline
+
+**Version:** `V0.18.8`
+
+Copyright © 2026.
+
+This project is not intended to be considered production-ready medical, privacy, compliance, or security software without appropriate security assessment, testing, validation, and compliance review.

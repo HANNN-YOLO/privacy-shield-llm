@@ -1,129 +1,514 @@
 # privacy-shield-llm
 
-Pipeline keamanan HealthTech otomatis yang mendeteksi dan melakukan redaksi terhadap Protected Health Information (PHI) dan Personally Identifiable Information (PII) sebelum data diproses oleh Large Language Models (LLMs), sehingga mendukung aplikasi AI yang aman, menjaga privasi, dan memenuhi kebutuhan kepatuhan.
+Pipeline keamanan HealthTech otomatis yang dirancang untuk mendeteksi, melakukan pseudonymization, redaction, mapping, dan restoration terhadap Protected Health Information (PHI) dan Personally Identifiable Information (PII) dari teks klinis melalui pipeline pemrosesan yang terstruktur dan terukur.
 
-## 1. Gambaran Umum Proyek
+Sistem ini menggabungkan deteksi berbasis rule, pengenalan entitas berbasis NLP, pemrosesan entitas, pseudonymization, mapping token berbasis Redis, restoration, serta metrik pemrosesan untuk menyediakan workflow perlindungan PHI/PII yang aman dan dapat diaudit.
 
-**privacy-shield-llm** adalah pipeline keamanan HealthTech yang dirancang untuk mengurangi risiko tereksposnya data PHI/PII sensitif ke aplikasi berbasis LLM.
+---
 
-Pipeline menggabungkan:
+## 1. Gambaran Umum Project
 
-- FastAPI untuk lapisan API
-- Regex untuk mendeteksi PII terstruktur
-- spaCy dan Microsoft Presidio untuk deteksi entitas berbasis NLP
+**privacy-shield-llm** merupakan pipeline keamanan HealthTech yang dirancang untuk mengurangi risiko tereksposnya data sensitif PHI/PII selama proses pemrosesan teks klinis.
+
+Pipeline memisahkan workflow pemrosesan ke dalam beberapa tahapan khusus:
+
+- FastAPI sebagai API layer
+- Regex-based detection untuk PII terstruktur
+- Microsoft Presidio untuk pengenalan entitas berbasis NLP
+- RecognizerResult processing untuk memproses entitas yang terdeteksi
+- Entity Processor untuk klasifikasi PHI/PII berdasarkan konteks
+- Resolver untuk resolusi entitas
+- Normalizer untuk normalisasi entitas
 - Pseudonymization untuk entitas sensitif
-- Redis untuk token mapping dan reverse mapping
+- `redact_service` sebagai proses utama redaction
+- `mapping_service` untuk penyimpanan dan pengambilan token/key
+- Redis sebagai persistent mapping storage
+- `restore_service` untuk mengembalikan entitas yang telah dimapping
+- Metrics untuk pengukuran waktu pemrosesan dan hasil deteksi
 - Docker untuk deployment berbasis container
 - Automated testing dan CI/CD untuk validasi
 
-Alur utama sistem:
+Sistem terdiri dari dua alur pemrosesan utama:
+
+1. **Redact Flow**
+2. **Restore Flow**
+
+### Redact Flow
+
+Proses redaction dimulai dari Front-End dan melewati structured detection, NLP recognition, entity processing, normalization, pseudonymization, hingga akhirnya diproses oleh `redact_service`.
 
 ```text
-Clinical Text
-    |
-    v
-Deteksi PII/PHI
-   |          |
- Regex       NLP
-   |          |
-   +----+-----+
-        |
-        v
-Pseudonymization / Redaction
-        |
-        v
-Sanitized Text
-        |
-        v
-LLM Processing
-        |
-        v
-Reverse Mapping
-        |
-        v
-Restored Response
+                    Input (Front-End)
+                           |
+                           v
+                   Regex Detection
+               (EMAIL, DATE, PHONE, ID)
+                           |
+                           v
+                        Presidio
+                           |
+                           v
+                   RecognizerResult
+                           |
+                           v
+                   Entity Processor
+            (PATIENT, DOCTOR, ADDRESS, CONTEXT)
+                           |
+                           v
+                       Resolver
+                           |
+                           v
+                      Normalizer
+                           |
+                           v
+                  Pseudonymization
+                           |
+                           v
+                    redact_service
+                       /       \
+                      /         \
+                     v           v
+                 Metric    mapping_service
+                                |
+                                v
+                           Redis Storage
 ```
+
+`redact_service` bertindak sebagai titik pemrosesan utama setelah tahap pseudonymization.
+
+Service ini menghasilkan dua jalur pemrosesan:
+
+- **Metric Path** — mencatat waktu pemrosesan, informasi deteksi PII/PHI, dan metrik yang berkaitan dengan response.
+- **Mapping Path** — mengirim key/token yang dihasilkan ke `mapping_service`, yang kemudian menyimpan mapping tersebut di Redis.
+
+### Restore Flow
+
+Proses restore mengambil mapping yang diperlukan dari Redis sebelum mengembalikan entitas yang telah dipseudonymize.
+
+```text
+                    Input (Front-End)
+                           |
+                           v
+                   mapping_service
+                      (GET KEYS)
+                           |
+                           v
+                         Metric
+             (Processing Time & PII/PHI Detection)
+                           |
+                           v
+                    restore_service
+                           |
+                           v
+                        Response
+```
+
+Restore Flow menggunakan mapping yang sebelumnya disimpan oleh workflow redaction untuk mengembalikan nilai yang sesuai sebelum response diberikan.
+
+---
 
 ## 2. Gambaran Sistem
 
-Sistem memisahkan proses deteksi, transformasi, mapping, dan restoration ke dalam komponen yang berbeda.
+Sistem memisahkan proses detection, entity processing, transformation, mapping, restoration, dan metrics ke dalam beberapa komponen khusus.
 
 ### Detection Layer
 
-Entitas terstruktur seperti email, nomor telepon, tanggal, dan ID dideteksi menggunakan regular expression.
+Detection layer mengidentifikasi PHI/PII terstruktur dan berbasis konteks dari teks klinis yang masuk.
 
-Deteksi berbasis NLP digunakan untuk entitas yang membutuhkan konteks, seperti:
+#### Regex Detection
 
-- Nama pasien
-- Nama dokter
-- Organisasi
-- Alamat dan lokasi
-- Entitas lain yang bergantung pada konteks
+Regular expression digunakan untuk structured identifiers seperti:
+
+- Email
+- Nomor telepon
+- Tanggal
+- Nomor identitas
+
+Alur awal detection adalah:
+
+```text
+                    Input Text
+                        |
+                        v
+                Regex Detection
+                        |
+                        +---- EMAIL
+                        +---- DATE
+                        +---- PHONE
+                        +---- ID
+```
+
+Regex detection menyediakan lapisan awal yang deterministic untuk mendeteksi PII terstruktur.
+
+#### Presidio Detection
+
+Setelah tahap Regex Detection, teks diproses menggunakan Microsoft Presidio untuk melakukan pengenalan entitas berbasis NLP.
+
+```text
+                Clinical Text
+                        |
+                        v
+                    Presidio
+                        |
+                        v
+                RecognizerResult
+```
+
+Presidio bertanggung jawab untuk mengidentifikasi entitas berbasis konteks yang tidak dapat dideteksi secara reliable hanya menggunakan regular expression sederhana.
+
+### RecognizerResult
+
+Hasil detection yang dihasilkan oleh Presidio diproses dalam bentuk `RecognizerResult`.
+
+Hasil tersebut menyediakan informasi yang diperlukan oleh tahap berikutnya untuk melakukan pemrosesan entitas lebih lanjut.
+
+### Entity Processor
+
+Entity Processor memproses output dari `RecognizerResult` dan mengubah entitas yang terdeteksi menjadi kategori internal yang telah distandarkan berdasarkan predefined medical rules.
+
+Logika mapping yang digunakan adalah:
+
+- `PERSON` → dikonversi menjadi `PATIENT` atau `DOCTOR` berdasarkan contextual role inference
+- `LOCATION`, `LOC`, `FAC`, `GPE` → dikonversi menjadi `ADDRESS`
+- `CONTEXT` → apabila teks yang terdeteksi merepresentasikan kondisi medis atau nama penyakit, nilai asli dipertahankan tanpa dilakukan anonymization
+
+Tahap ini memastikan bahwa output NLP yang masih bersifat umum dapat diubah menjadi healthcare entity yang sesuai dengan domain, sekaligus mempertahankan konteks medis yang relevan.
+
+### Resolver
+
+Resolver memproses dan merekonsiliasi informasi entitas yang berasal dari beberapa sumber detection, yaitu Regex dan `RecognizerResult` + Entity Processor, kemudian menentukan entitas final sebelum masuk ke tahap normalization.
+
+Logika pengambilan keputusan adalah:
+
+- **Regex vs RecognizerResult conflict** → entitas dari Regex memiliki prioritas
+- **RecognizerResult vs Entity Processor conflict** → output Entity Processor memiliki prioritas
+- **Final fallback condition** → apabila tidak terdapat aturan conflict resolution yang berlaku, sistem menggunakan `RecognizerResult` asli
+
+```text
+                RecognizerResult
+                        |
+                        v
+                Entity Processor
+                        |
+                        v
+                    Resolver
+```
+
+### Normalizer
+
+Normalizer melakukan standardisasi terhadap informasi entitas yang telah diselesaikan oleh Resolver sebelum masuk ke tahap pseudonymization.
+
+```text
+                     Resolver
+                        |
+                        v
+                   Normalizer
+                        |
+                        v
+                Pseudonymization
+```
+
+Tahap ini memastikan informasi entitas telah dipersiapkan secara konsisten sebelum menghasilkan representasi pseudonymous.
+
+---
 
 ### Pseudonymization Layer
 
-Data sensitif yang terdeteksi dapat diganti dengan token yang stabil, misalnya:
+Entitas sensitif yang telah terdeteksi diubah menjadi nilai pseudonymous sehingga nilai aslinya tidak langsung terekspos.
+
+Contoh:
 
 ```text
-John Doe       -> [PATIENT_001]
-08123456789    -> [PHONE_001]
-john@email.com -> [EMAIL_001]
+John Doe        -> [PATIENT_001]
+08123456789     -> [PHONE_001]
+john@email.com  -> [EMAIL_001]
+123456789       -> [ID_001]
 ```
+
+Nilai yang telah dipseudonymize kemudian diteruskan ke `redact_service`.
+
+```text
+                Detected Entity
+                        |
+                        v
+                Pseudonymization
+                        |
+                        v
+                redact_service
+```
+
+Proses pseudonymization mempertahankan kemampuan untuk melakukan restoration terhadap nilai yang telah dimapping melalui mapping service dan restore service.
+
+---
+
+### Redact Service
+
+`redact_service` bertanggung jawab menangani proses redaction akhir setelah entity detection, processing, resolution, normalization, dan pseudonymization selesai dilakukan.
+
+Service ini menyediakan dua jalur pemrosesan:
+
+```text
+                    redact_service
+                    /             \
+                   /               \
+                  v                 v
+              Metric          mapping_service
+                                   |
+                                   v
+                                Redis
+```
+
+#### Metric Path
+
+Komponen Metric mencatat informasi yang berkaitan dengan proses redaction, termasuk:
+
+- Waktu pemrosesan redaction
+- Waktu pemrosesan detection
+- Informasi PII/PHI yang terdeteksi
+- Informasi pemrosesan response
+
+Hal ini memungkinkan sistem untuk mengukur dan mengevaluasi performa pipeline redaction.
+
+#### Mapping Path
+
+Mapping path mengirim mapping entitas yang telah dipseudonymize ke `mapping_service`.
+
+```text
+                Pseudonymized Entity
+                        |
+                        v
+                mapping_service
+                        |
+                        v
+                      Redis
+```
+
+---
 
 ### Redis Mapping Layer
 
-Redis menyimpan hubungan antara nilai asli dan token yang dihasilkan sehingga teks yang telah disanitasi dapat dikembalikan jika diperlukan.
+Redis digunakan sebagai persistent mapping storage untuk kebutuhan pseudonymization dan restoration.
 
-Mapping mendukung:
+Mapping service menyimpan hubungan antara key/token yang dihasilkan dengan nilai aslinya.
+
+Secara konseptual:
 
 ```text
-Original Entity -> Token
-Token           -> Original Entity
+                    KEY / TOKEN
+                        |
+                        v
+                Original Value
 ```
 
-### Reverse Mapping
+Mapping service bertanggung jawab untuk menyimpan dan mengambil mapping tersebut.
 
-Setelah proses LLM selesai, token pada response dapat dikembalikan ke nilai aslinya menggunakan Redis.
+Proses mapping adalah:
 
-Dengan demikian, informasi sensitif tetap dipisahkan dari tahap pemrosesan LLM.
+```text
+                redact_service
+                        |
+                        v
+                mapping_service
+                        |
+                        v
+                      Redis
+```
 
-## 3. Docker Deployment
+Pada proses restoration, mapping service mengambil key yang diperlukan:
 
-Project menyediakan konfigurasi Docker untuk menjalankan aplikasi dan Redis menggunakan container.
+```text
+                    Front-End
+                        |
+                        v
+                mapping_service
+                        |
+                        v
+                     GET KEYS
+                        |
+                        v
+                      Redis
+```
 
-Build image aplikasi:
+---
+
+### Flow Reverse Mapping
+
+Reverse Mapping merupakan proses untuk mengambil kembali nilai asli berdasarkan pseudonymized key/token yang diterima dari Front-End.
+
+Berbeda dengan Redact Flow yang membuat dan menyimpan mapping, Reverse Mapping menggunakan mapping yang sudah tersedia di Redis untuk melakukan lookup terhadap nilai asli.
+
+Alur Reverse Mapping adalah:
+
+```text
+                    Input (Front-End)
+                           |
+                           v
+                   mapping_service
+                  (GET KEY / TOKEN)
+                           |
+                           v
+                     Redis Lookup
+                           |
+                           v
+                    Reverse Mapping
+                           |
+                           v
+                    restore_service
+                           |
+                           v
+                         Metric
+             (Processing Time & PII/PHI Detection)
+                           |
+                           v
+                        Response
+```
+
+Proses Reverse Mapping dimulai ketika Front-End mengirim pseudonymized key/token.
+
+`mapping_service` menerima key/token tersebut dan melakukan lookup ke Redis untuk mendapatkan nilai asli yang sebelumnya disimpan pada saat Redact Flow.
+
+Contoh:
+
+```text
+                    Input
+               [PATIENT_001]
+                       |
+                       v
+               mapping_service
+                       |
+                       v
+                 Redis Lookup
+                       |
+                       v
+          [PATIENT_001] -> "John Doe"
+                       |
+                       v
+              Reverse Mapping
+                       |
+                       v
+               restore_service
+                       |
+                       v
+               Output: John Doe
+```
+
+Dengan demikian, alur hubungan antara Redact Flow dan Reverse Mapping adalah:
+
+```text
+                    REDACT FLOW
+                         |
+                         v
+                Pseudonymization
+                         |
+                         v
+                mapping_service
+                         |
+                         v
+                       Redis
+                         |
+                         |
+                    Stored Mapping
+                         |
+                         |
+                         v
+              REVERSE MAPPING FLOW
+                         |
+                         v
+                mapping_service
+                  (GET KEY/TOKEN)
+                         |
+                         v
+                  Redis Lookup
+                         |
+                         v
+                 Original Value
+                         |
+                         v
+                 restore_service
+                         |
+                         v
+                      Response
+```
+
+Dalam desain ini, `mapping_service` bertanggung jawab untuk menyimpan token mapping selama Redact Flow dan mengambilnya kembali selama Reverse Mapping Flow, sehingga terdapat hubungan satu-ke-satu yang konsisten antara pseudonymized token dan nilai PHI/PII aslinya.
+
+Pada implementasi ini, Reverse Mapping tidak membutuhkan integrasi LLM. Reverse Mapping merupakan mekanisme direct mapping lookup yang mengambil nilai asli berdasarkan pseudonymized key/token.
+
+### Metrics
+
+Metrics terintegrasi pada workflow redaction maupun restoration.
+
+Untuk proses redaction:
+
+```text
+                redact_service
+                        |
+                        v
+                      Metric
+```
+
+Untuk proses restoration:
+
+```text
+                mapping_service
+                        |
+                        v
+                restore_service
+                        |
+                        v
+                     Metric
+```
+
+Sistem Metric digunakan untuk mengukur:
+
+- Waktu pemrosesan
+- Detection processing
+- Informasi deteksi PII/PHI
+- Response processing
+
+Pengukuran tersebut mendukung validasi sistem dan evaluasi performa pipeline.
+
+---
+
+## 3. Deployment Docker
+
+Project menyediakan konfigurasi Docker untuk menjalankan aplikasi dan Redis di dalam container.
+
+Build application image:
 
 ```bash
 docker build -t privacy-shield-llm:latest .
 ```
 
-Jalankan application container sesuai konfigurasi Docker project.
+Jalankan application container sesuai dengan konfigurasi Docker pada project.
 
-Untuk Redis, project menyediakan Docker Compose.
+Untuk service Redis, Docker Compose telah disediakan.
 
-## 4. Redis Setup
+---
 
-Redis digunakan sebagai penyimpanan mapping untuk proses pseudonymization dan reverse mapping.
+## 4. Setup Redis
 
-Jalankan Redis:
+Redis digunakan sebagai mapping storage untuk kebutuhan pseudonymization dan restoration.
+
+### Menjalankan Redis
 
 ```bash
 docker compose up -d redis
 ```
 
-Periksa container:
+### Memeriksa Container
 
 ```bash
 docker compose ps
 ```
 
-Lihat log Redis:
+### Melihat Log Redis
 
 ```bash
 docker compose logs -f redis
 ```
 
-Tes koneksi Redis:
+### Menguji Koneksi Redis
 
 ```bash
 docker exec -it privacy-shield-redis redis-cli ping
@@ -135,23 +520,25 @@ Hasil yang diharapkan:
 PONG
 ```
 
-Hentikan Redis:
+### Menghentikan Redis
 
 ```bash
 docker compose stop redis
 ```
 
-Hapus container:
+### Menghapus Container Redis
 
 ```bash
 docker compose down
 ```
 
-Data Redis disimpan di Docker volume `redis_data`.
+Data Redis disimpan di dalam Docker volume `redis_data`.
+
+---
 
 ## 5. Konfigurasi Environment
 
-Konfigurasi sensitif dimuat melalui environment variables.
+Nilai konfigurasi sensitif dimuat melalui environment variables.
 
 Contoh:
 
@@ -162,15 +549,17 @@ REDIS_DB=0
 REDIS_PASSWORD=
 ```
 
-Untuk menjalankan project menggunakan container, environment variables dapat diberikan melalui Docker Compose.
+Untuk eksekusi menggunakan container, environment variables dapat diberikan melalui Docker Compose.
 
-Jangan commit file `.env` asli atau credential ke repository.
+> **Catatan Keamanan:** Jangan melakukan commit file `.env` asli atau credentials ke repository.
 
-Gunakan `.env.example` jika ingin membagikan struktur konfigurasi yang dibutuhkan.
+Gunakan `.env.example` ketika membagikan struktur konfigurasi yang diperlukan.
+
+---
 
 ## 6. Struktur Project
 
-Struktur sederhana project:
+Struktur project secara sederhana adalah:
 
 ```text
 privacy-shield-llm/
@@ -199,56 +588,86 @@ privacy-shield-llm/
 └── README-ID.md
 ```
 
-Struktur implementasi dapat berubah seiring perkembangan project.
+Struktur implementasi dapat berkembang seiring dengan perkembangan project.
+
+---
 
 ## 7. Pertimbangan Keamanan
 
-Pipeline dirancang berdasarkan prinsip meminimalkan paparan data sensitif sebelum data diproses oleh LLM.
+Pipeline dirancang dengan pendekatan meminimalkan exposure terhadap PHI/PII sensitif selama proses pemrosesan teks klinis.
 
-Pertimbangan keamanan utama:
+Pertimbangan keamanan utama meliputi:
 
-- Deteksi PHI/PII sebelum data dikirim ke LLM.
-- Usahakan nilai sensitif asli tidak masuk ke teks yang diproses LLM.
-- Gunakan token pseudonymous sebagai pengganti nilai sensitif.
-- Simpan mapping token di Redis dan jangan mengekspos mapping tersebut ke LLM.
-- Lindungi credential Redis menggunakan environment variables.
-- Jangan commit file `.env` yang berisi secret.
-- Lakukan validasi terhadap input dan output.
-- Uji entity yang sama secara berulang untuk memastikan mapping tetap konsisten.
-- Uji unknown token dan mapping yang hilang agar dapat ditangani dengan aman.
-- Untuk production, pertimbangkan persistence Redis, access control, network isolation, dan perlindungan credential.
+- Mendeteksi PHI/PII sebelum data sensitif diproses lebih lanjut.
+- Menggunakan Regex untuk structured PII detection.
+- Menggunakan NLP-based recognition untuk contextual entities.
+- Memproses entity yang terdeteksi melalui dedicated entity-processing stages.
+- Menggunakan pseudonymous token sebagai pengganti nilai sensitif secara langsung.
+- Menyimpan mapping information secara terpisah di Redis.
+- Membatasi akses terhadap Redis credentials melalui environment variables.
+- Tidak melakukan commit file `.env` yang berisi secrets.
+- Melakukan validasi terhadap input dan output data.
+- Menguji duplicate entities untuk memastikan konsistensi mapping.
+- Menguji unknown token dan missing mapping secara aman.
+- Mengukur waktu pemrosesan redaction dan restoration.
+- Mempertimbangkan Redis persistence, access control, network isolation, dan credential protection pada production.
+- Tidak mengekspos PHI/PII asli di source code, documentation, testing data, screenshots, atau repository commits.
+
+---
 
 ## 8. Threat Model
 
-Analisis keamanan project disimpan secara terpisah.
+Analisis keamanan project didokumentasikan secara terpisah.
 
-- [Threat Model — Indonesia](Threat-model-ID.md)
+- [Threat Model — English](Threat-model-EN.md)
+- [Threat Model — Indonesian](Threat-model-ID.md)
 
-Threat model berfokus pada risiko keamanan yang berkaitan dengan pipeline redaction PHI/PII HealthTech, termasuk kebocoran data sensitif, akses mapping tanpa izin, risiko yang berkaitan dengan LLM, keamanan Redis, dan integritas pipeline.
+Threat model berfokus pada risiko keamanan yang relevan terhadap pipeline redaction PHI/PII HealthTech, termasuk:
+
+- Sensitive-data exposure
+- Unauthorized mapping access
+- PHI/PII detection bypass
+- Incorrect entity classification
+- Mapping security
+- Redis security
+- Data restoration risks
+- Pipeline integrity
+- Sensitive-data leakage melalui logs atau documentation
+
+---
 
 ## 9. Dokumentasi
 
-Dokumentasi tambahan project disimpan secara terpisah dari README utama.
+Dokumentasi tambahan project dikelola secara terpisah dari README utama.
 
-Dokumentasi utama meliputi:
+Dokumentasi penting meliputi:
 
-- Threat Model — Indonesia
-- System Validation & Performance Testing — Indonesia
+- Threat Model — English
+- Threat Model — Indonesian
+- System Validation & Performance Testing — English
 - Development and learning notes
+
+Dokumentasi mencakup architecture, security considerations, testing, performance measurements, dan development process project.
+
+---
 
 ## 10. Informasi Project
 
-**Project:** HealthTech — Automated PHI/PII Redaction Pipeline for LLMs
+**Project:** HealthTech — Automated PHI/PII Redaction Pipeline
 
 **Repository:** `privacy-shield-llm`
 
-**Technology:** Python, FastAPI, spaCy, Microsoft Presidio, Redis, Docker
+**Technology:** Python, FastAPI, Regex, Microsoft Presidio, Redis, Docker
 
-**Purpose:** Melindungi data sensitif HealthTech sebelum diproses oleh aplikasi berbasis LLM.
+**Core Components:** Regex Detection, Presidio, RecognizerResult, Entity Processor, Resolver, Normalizer, Pseudonymization, Redact Service, Mapping Service, Restore Service, dan Metrics
+
+**Purpose:** Mendeteksi, melakukan pseudonymization, redaction, mapping, dan restoration terhadap PHI/PII sensitif melalui security pipeline yang terstruktur dan terukur.
+
+---
 
 ## 11. Jadwal Pengembangan
 
-### Bootcamp Preparation
+### Persiapan Bootcamp
 
 | Tanggal       | Aktivitas         |
 | ------------- | ----------------- |
@@ -287,39 +706,156 @@ Dokumentasi utama meliputi:
 
 **July 27 – August 2, 2026**
 
-| Tanggal  | Aktivitas                                                   | Commit                                                                            |
-| -------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| July 27  | Day 15 - NLP & NER Research                                 | `docs: add NLP and named entity recognition learning notes`                       |
-| July 28  | Day 16 - spaCy Integration                                  | `feat: integrate spaCy named entity recognition`                                  |
-| July 29  | Day 17 - Microsoft Presidio Integration                     | `feat: integrate Microsoft Presidio analyzer engine`                              |
-| July 30  | Day 18 - Person Entity Detection                            | `feat: implement patient and doctor name detection`                               |
-| July 31  | Day 19 - Address Entity Detection                           | `feat: implement address and location entity detection`                           |
-| August 1 | Day 20 - Context-Aware Detection                            | `feat: improve contextual entity recognition for medical terms`                   |
-| August 2 | Day 21 - NLP Pipeline Integration & Documentation in Week 3 | `feat: integrate NLP detection into redaction pipeline & documentation in week 3` |
+| Tanggal   | Aktivitas                                                   | Commit                                                                            |
+| --------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| July 27   | Day 15 - NLP & NER Research                                 | `docs: add NLP and named entity recognition learning notes`                       |
+| July 28   | Day 16 - spaCy Integration                                  | `feat: integrate spaCy named entity recognition`                                  |
+| July 29   | Day 17 - Microsoft Presidio Integration                     | `feat: integrate Microsoft Presidio analyzer engine`                              |
+| July 30   | Day 18 - Person Entity Detection                            | `feat: implement patient and doctor name detection`                               |
+| July 31   | Day 19 - Address Entity Detection                           | `feat: implement address and location entity detection`                           |
+| August 01 | Day 20 - Context-Aware Detection                            | `feat: improve contextual entity recognition for medical terms`                   |
+| August 02 | Day 21 - NLP Pipeline Integration & Documentation in Week 3 | `feat: integrate NLP detection into redaction pipeline & documentation in week 3` |
 
 ### Week 4 — Integration & Deployment
 
 **August 3 – August 9, 2026**
 
-| Tanggal   | Aktivitas                                                                   | Commit                                                               |
-| --------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| August 3  | Day 22 - Pseudonymization Engine                                            | `feat: implement pseudonymization engine for sensitive entities`     |
-| August 4  | Day 23 - Redis Token Mapping Service                                        | `feat: implement Redis-based token mapping service`                  |
-| August 5  | Day 24 - Reverse Mapping Integration                                        | `feat: integrate reverse mapping into LLM response pipeline`         |
-| August 6  | Day 25 - System Validation & Performance Testing                            | `test: validate end-to-end pipeline performance and reverse mapping` |
-| August 7  | Day 26 - Threat Modeling & Security Analysis for PHI/PII Redaction Pipeline | `docs: add HealthTech PII threat modeling`                           |
-| August 8  | Day 27 - Project Documentation, Architecture & Security Report              | `docs: finalize project documentation`                               |
-| August 09 | Day 28 - Documentation in Week 4                                            | `docs: documentation in Week 4`                                      |
-
-## 12. Testing
-
-Dokumentasi testing disimpan secara terpisah untuk versi English dan Indonesia.
-
-- [System Validation & Performance Testing — Indonesia](System%20Validation%20%26%20Performance%20Testing-ID.md)
-
-Testing mencakup functional validation, duplicate entity mapping, clinical input testing, performance testing, reverse mapping, unknown tokens, empty input, dan Redis mapping behavior.
+| Tanggal   | Aktivitas                                                                   | Commit                                                                  |
+| --------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| August 03 | Day 22 - Pseudonymization Engine                                            | `feat: implement pseudonymization engine for sensitive entities`        |
+| August 04 | Day 23 - Redis Token Mapping Service                                        | `feat: implement Redis-based token mapping service`                     |
+| August 05 | Day 24 - Restore Mapping Integration                                        | `feat: integrate mapping retrieval into restore pipeline`               |
+| August 06 | Day 25 - System Validation & Performance Testing                            | `test: validate end-to-end pipeline performance and restore processing` |
+| August 07 | Day 26 - Threat Modeling & Security Analysis for PHI/PII Redaction Pipeline | `docs: add HealthTech PII threat modeling`                              |
+| August 08 | Day 27 - Project Documentation, Architecture & Security Report              | `docs: finalize project documentation`                                  |
+| August 09 | Day 28 - Documentation in Week 4                                            | `docs: documentation in Week 4`                                         |
 
 ---
 
-**Project:** privacy-shield-llm  
-**HealthTech Security Pipeline — PHI/PII Protection for LLM Applications V0.18.8**
+## 12. Testing
+
+Dokumentasi testing dikelola secara terpisah untuk versi English dan Indonesian.
+
+- [System Validation & Performance Testing — English](System%20Validation%20%26%20Performance%20Testing-EN.md)
+
+Testing mencakup:
+
+- Regex detection validation
+- Presidio entity detection
+- RecognizerResult processing
+- Entity Processor validation
+- Resolver validation
+- Normalizer validation
+- Pseudonymization validation
+- Duplicate entity mapping
+- Clinical input testing
+- Redaction processing time
+- PII/PHI detection metrics
+- Mapping service validation
+- Redis mapping behavior
+- Mapping key retrieval
+- Restore processing
+- Unknown tokens
+- Missing mappings
+- Empty input
+- Response validation
+- End-to-end redaction dan restoration workflow
+
+---
+
+## 🔐 Security Features
+
+- PHI/PII detection
+- Regex-based structured detection
+- NLP-based contextual entity detection
+- Patient and doctor name detection
+- Address and location detection
+- Context-aware medical entity detection
+- Pseudonymization
+- Redis-based token mapping
+- Reverse mapping
+- Docker containerization
+- CI/CD automation
+- Threat modeling
+- System validation and performance testing
+
+---
+
+## 📦 Project Deliverables
+
+- FastAPI backend
+- Front-End interface
+- Regex detection modules
+- Email detection
+- Phone detection
+- Date detection
+- ID detection
+- Microsoft Presidio integration
+- RecognizerResult processing
+- Entity Processor
+- Resolver
+- Normalizer
+- Pseudonymization engine
+- Redact Service
+- Mapping Service
+- Redis token/key mapping
+- Restore Service
+- Metrics and processing-time measurement
+- Docker configuration
+- Docker Compose configuration
+- GitHub Actions CI/CD
+- Docker Hub image
+- Threat Model
+- Architecture documentation
+- Testing documentation
+- Security report
+
+---
+
+## 🔮 Future Improvements
+
+- Advanced contextual PHI/PII detection
+- Improved entity resolution
+- Improved entity normalization
+- More comprehensive PHI/PII recognizers
+- Advanced pseudonymization strategies
+- Mapping expiration policies
+- Redis security hardening
+- Role-Based Access Control (RBAC)
+- Audit logging
+- Advanced performance monitoring
+- Monitoring and alerting
+- Kubernetes deployment
+- Cloud deployment
+- Additional security validation and compliance analysis
+
+---
+
+## 👥 Contributors
+
+| Member   | Responsibility                          |
+| -------- | --------------------------------------- |
+| Member 1 | FastAPI & API Layer                     |
+| Member 2 | Regex Detection                         |
+| Member 3 | NLP Detection                           |
+| Member 4 | Token Mapping, Integration & Deployment |
+
+---
+
+# License
+
+Project ini dikembangkan untuk **tujuan edukasi** sebagai bagian dari **Infotact Technical Internship Program — Advanced Cybersecurity Project**.
+
+Project ditujukan untuk kebutuhan edukasi, development, testing, dan demonstrasi cybersecurity engineering.
+
+Implementasi berfokus pada perlindungan PHI/PII dalam HealthTech melalui detection, pseudonymization, mapping, redaction, restoration, dan performance measurement.
+
+**Project:** `privacy-shield-llm`
+
+**Project:** HealthTech — Automated PHI/PII Redaction Pipeline
+
+**Version:** `V0.18.8`
+
+Copyright © 2026.
+
+Project ini tidak dimaksudkan untuk dianggap sebagai software medical, privacy, compliance, atau security yang siap digunakan pada production tanpa security assessment, testing, validation, dan compliance review yang sesuai.
