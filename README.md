@@ -322,4 +322,4 @@ The testing scope includes functional validation, duplicate entity mapping, clin
 ---
 
 **Project:** privacy-shield-llm  
-**HealthTech Security Pipeline — PHI/PII Protection for LLM Applications V0.18.4**
+**HealthTech Security Pipeline — PHI/PII Protection for LLM Applications V0.18.5**
