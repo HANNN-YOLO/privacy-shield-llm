@@ -856,7 +856,7 @@ The implementation focuses on HealthTech PHI/PII protection through detection, p
 
 **Project:** HealthTech — Automated PHI/PII Redaction Pipeline
 
-**Version:** `V0.18.8`
+**Version:** `V0.19.9`
 
 Copyright © 2026.
 
