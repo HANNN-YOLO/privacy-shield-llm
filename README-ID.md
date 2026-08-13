@@ -311,6 +311,9 @@ Proses mapping adalah:
                 mapping_service
                         |
                         v
+                    SAVE KEYS
+                        |
+                        v
                       Redis
 ```
 
@@ -401,7 +404,8 @@ Dengan demikian, alur hubungan antara Redact Flow dan Reverse Mapping adalah:
                 Pseudonymization
                          |
                          v
-                mapping_service
+                   mapping_service
+                  (SAVE KEY / TOKEN)
                          |
                          v
                        Redis
@@ -414,7 +418,7 @@ Dengan demikian, alur hubungan antara Redact Flow dan Reverse Mapping adalah:
               REVERSE MAPPING FLOW
                          |
                          v
-                mapping_service
+                  mapping_service
                   (GET KEY/TOKEN)
                          |
                          v

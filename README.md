@@ -311,6 +311,9 @@ The mapping process is:
                 mapping_service
                         |
                         v
+                    SAVE KEYS
+                        |
+                        v
                       Redis
 ```
 
@@ -331,7 +334,7 @@ During restoration, the mapping service retrieves the required keys:
 
 ---
 
-Flow Reverse Mapping
+### Flow Reverse Mapping
 
 The reverse mapping process accepts a pseudonymized key/token from the Front-End and performs a lookup through mapping_service, which is responsible for retrieving the original value from Redis based on the stored token mapping generated during the Redact Flow.
 
@@ -395,7 +398,8 @@ Thus, the flow of the relationship between Redact Flow and Reverse Mapping is:
                 Pseudonymization
                          |
                          v
-                mapping_service
+                  mapping_service
+                 (SAVE KEY / TOKEM)
                          |
                          v
                        Redis
@@ -408,7 +412,7 @@ Thus, the flow of the relationship between Redact Flow and Reverse Mapping is:
               REVERSE MAPPING FLOW
                          |
                          v
-                mapping_service
+                  mapping_service
                   (GET KEY/TOKEN)
                          |
                          v

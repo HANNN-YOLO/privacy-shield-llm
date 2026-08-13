@@ -14,17 +14,29 @@ app = FastAPI(
 # ==========================================
 
 origins = [
+    # Front-End
     "http://127.0.0.1:5500",
     "http://localhost:5500",
-    "http://10.24.40.226:5500",
+    "http://10.168.55.226:5500",
 
     "http://127.0.0.1:3000",
     "http://localhost:3000",
-    "http://10.24.40.226:3000",
+    "http://10.168.55.226:3000",
 
+    # redis
     "http://127.0.0.1:6379",
     "http://localhost:6379",
-    "http://10.24.40.226:6379",
+    "http://10.168.55.226:6379",
+
+    # docker
+    "http://127.0.0.1:8080",
+    "http://localhost:8080",
+    "http://10.168.55.226:8080",
+
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "http://10.168.55.226:8000",
+    
 ]
 
 app.add_middleware(
@@ -51,5 +63,5 @@ def root():
     return {
         "application": "Privacy Shield LLM",
         "status": "Running",
-        "version": "0.18.8"
+        "version": "0.19.8"
     }
