@@ -6,7 +6,7 @@ API CONFIGURATION
 // const API_BASE_URL = "http://127.0.0.1:8000";
 
 // IPv4
-const API_BASE_URL = "http://10.182.106.226:8000";
+const API_BASE_URL = "http://10.77.129.226:8000";
 
 /* ======================================================
 HEALTH CHECK

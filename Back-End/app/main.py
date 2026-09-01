@@ -17,25 +17,25 @@ origins = [
     # Front-End
     "http://127.0.0.1:5500",
     "http://localhost:5500",
-    "http://10.182.106.226:5500",
+    "http://10.77.129.226:5500",
 
     "http://127.0.0.1:3000",
     "http://localhost:3000",
-    "http://10.182.106.226:3000",
+    "http://10.77.129.226:3000",
 
     # redis
     "http://127.0.0.1:6379",
     "http://localhost:6379",
-    "http://10.182.106.226:6379",
+    "http://10.77.129.226:6379",
 
     # docker
     "http://127.0.0.1:8080",
     "http://localhost:8080",
-    "http://10.182.106.226:8080",
+    "http://10.77.129.226:8080",
 
     "http://127.0.0.1:8000",
     "http://localhost:8000",
-    "http://10.182.106.226:8000",
+    "http://10.77.129.226:8000",
     
 ]
 
@@ -63,5 +63,5 @@ def root():
     return {
         "application": "Privacy Shield LLM",
         "status": "Running",
-        "version": "0.20.9"
+        "version": "0.21.9"
     }
